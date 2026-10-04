@@ -1,0 +1,16 @@
+{
+  "name": "mila-harys-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Portfolio of mila harys — stylist, art director, model",
+  "scripts": {
+    "media": "node tools/build-media.mjs",
+    "dev": "npx serve docs -l 5173"
+  },
+  "devDependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "ffprobe-static": "^3.1.0",
+    "sharp": "^0.34.3"
+  }
+}

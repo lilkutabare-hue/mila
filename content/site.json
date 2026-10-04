@@ -1,0 +1,24 @@
+{
+  "name": "mila harys",
+  "role": "TODO: stylist · art direction · model",
+  "city": "TODO",
+  "lang": "en",
+  "description": "TODO",
+  "url": "https://lilkutabare-hue.github.io/mila",
+  "instagram": "milaharys",
+  "email": "milaharys@gmail.com",
+  "telegram": "TODO",
+  "labels": {
+    "gallery": "wardrobe",
+    "contact": "contact"
+  },
+  "categories": {
+    "styling": "styling",
+    "modeling": "modeling",
+    "artdir + styling": "art direction + styling"
+  },
+  "railMode": "mix",
+  "railPerProject": 6,
+  "stripMin": 2,
+  "stripMax": 2
+}
