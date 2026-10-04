@@ -4,8 +4,9 @@ export const FINE = matchMedia('(hover: hover) and (pointer: fine)');
 
 // A tile whose physical height fits in the rail tier gets rail; anything bigger gets full.
 export function pickTier(item, cssW, cssH) {
-  const dpr = devicePixelRatio || 1;
-  return cssH * dpr <= item.rail.h * 1.05 ? 'rail' : 'full';
+  const need = cssH * (devicePixelRatio || 1);
+  if (item.small && need <= item.small.h * 1.05) return 'small';
+  return need <= item.rail.h * 1.05 ? 'rail' : 'full';
 }
 export function photoSrc(item, tier) { return item.type === 'photo' ? item[tier].src : item.poster[tier]; }
 

@@ -2,7 +2,7 @@
 // One transform per frame on the track; nodes keep static left/top and only hop by loopW when they wrap.
 import { pickTier, preloadImage, REDUCED } from './media.js';
 
-export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, drift = 0, depth = 0, onOpen }) {
+export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, drift = 0, depth = 0, maxTier = 'full', onOpen }) {
   let looping = loop;                      // a band loops too once it is wider than the screen
   const track = stage.querySelector('.track');
   let live = items.slice(), nodes = [], base = new Map();
@@ -10,6 +10,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   let raf = 0, active = false, suppressClick = false;
   let inVel = 0, lastInput = 0;            // smoothed input speed (px/s) for the glide after the wheel stops
   let dragY = 0, dragYTarget = 0;          // vertical pull of the whole track (swipe-down to close)
+  let firstScreen = true;                  // the first frames fetched get fetchpriority=high
   let lastTouch = performance.now();      // any input; the drift ramps up again from zero after it
   const driftDir = Math.random() < 0.5 ? -1 : 1;   // this visit's direction
 
@@ -128,13 +129,17 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
         node.el.classList.add('loaded');
       };
       img.onerror = () => fail(node);
-      img.src = item.rail.src; node.el.appendChild(img); node.media = img;
-      if (pickTier(item, node.w, node.h) === 'full') preloadImage(item.full.src).then(() => { if (node.el.isConnected) img.src = item.full.src; }).catch(() => {});
+      let tier = pickTier(item, node.w, node.h);
+      if (tier === 'full' && maxTier !== 'full') tier = 'rail';     // the collage never needs 2560px frames
+      if (node.visible || firstScreen) img.fetchPriority = 'high';
+      img.src = (tier === 'full' ? item.rail : item[tier]).src; node.el.appendChild(img); node.media = img;
+      if (tier === 'full') preloadImage(item.full.src).then(() => { if (node.el.isConnected) img.src = item.full.src; }).catch(() => {});
     } else {
       const v = document.createElement('video');
       v.muted = true; v.playsInline = true; v.loop = true; v.preload = 'none';
       v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
-      v.poster = item.poster.rail; v.src = item.rail.src;
+      const small = item.small && pickTier(item, node.w, node.h) === 'small';
+      v.poster = item.poster.rail; v.src = (small ? item.small : item.rail).src;
       v.addEventListener('error', () => fail(node));
       node.el.classList.add('loaded'); node.el.appendChild(v); node.media = v;
     }
@@ -154,6 +159,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   let sizeCheck = 0;
   function frame(now) {
     raf = requestAnimationFrame(frame);
+    if (firstScreen && now - last > 0 && sizeCheck > 30) firstScreen = false;
     if (++sizeCheck % 20 === 0 && !ptr) { // every ~third of a second: did the viewport change under us?
       const w = stage.clientWidth || innerWidth, h = stage.clientHeight || innerHeight;
       if (Math.abs(w - vw) > 1 || Math.abs(h - vh) > vh * 0.15) build(nodes.find(n => n.visible)?.item || null);
@@ -177,7 +183,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     if (Math.abs(dragY - dragYTarget) < 0.1) dragY = dragYTarget;
     track.style.transform = `translate3d(${(offsetX - pos).toFixed(2)}px,${dragY.toFixed(1)}px,0)`;
     const speed = Math.abs(target - pos);        // px still to travel: the faster the flick, the further we preload
-    const ahead = vw * 2 + Math.min(vw * 4, speed * 1.5);
+    const ahead = vw * 1.25 + Math.min(vw * 4, speed * 1.5);
     const lo = pos - pad, hi = pos + vw + pad;  // world window that may be on screen
     for (const node of nodes) {
       let left = node.x;
@@ -191,7 +197,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
       const lx = looping && sx > vw * 2 ? sx - loopW : sx;
       if (!node.loaded && lx > -ahead && lx < ahead) load(node);
       if (on) {
-        if (!node.visible) { node.visible = true; node.el.classList.remove('off'); if (depth && node.depth) node.el.style.willChange = 'transform'; }
+        if (!node.visible) { node.visible = true; node.el.classList.remove('off'); node.el.style.willChange = 'transform'; }
         if (depth && node.depth) node.el.style.transform = `translate3d(${((sx + node.w / 2 - vw / 2) * node.depth * depth).toFixed(1)}px,0,0)`;
         if (node.item.type === 'motion') playVideo(node, (Math.min(vw, sx + node.w) - Math.max(0, sx)) / node.w);
       } else if (node.visible) { node.visible = false; node.el.classList.add('off'); node.el.style.willChange = ''; if (node.item.type === 'motion') playVideo(node, 0); }

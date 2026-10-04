@@ -12,7 +12,7 @@ if (!document.getElementById('stage')) document.body.insertAdjacentHTML('beforee
 const manifest = await (await fetch(BASE + 'data/manifest.json', { cache: 'no-cache' })).json();
 const site = manifest.site || {};
 for (const i of manifest.items) {
-  i.rail.src = abs(i.rail.src); i.full.src = abs(i.full.src);
+  i.rail.src = abs(i.rail.src); i.full.src = abs(i.full.src); if (i.small) i.small.src = abs(i.small.src);
   if (i.poster) { i.poster.rail = abs(i.poster.rail); i.poster.full = abs(i.poster.full); }
 }
 if (site.brand) { site.brand.seal = abs(site.brand.seal); site.brand.mask = abs(site.brand.mask); site.brand.loops = (site.brand.loops || []).map(abs); }
@@ -81,7 +81,7 @@ const contactEl = $('#contact');
 }
 
 // ---- strips
-const strip = createStrip({ items: selected, stage: $('#stage'), loop: true, layout: 'scatter', drift: 6, depth: 0.05, onOpen: item => navigate(`p/${item.projectObj.slug}`) });
+const strip = createStrip({ items: selected, stage: $('#stage'), loop: true, layout: 'scatter', drift: 6, depth: 0.05, maxTier: 'rail', onOpen: item => navigate(`p/${item.projectObj.slug}`) });
 const projectStrip = createStrip({ items: [], stage: $('#project-stage'), loop: false, loopIfWide: true, layout: 'band', swipeDown: true, onOpen: item => navigate(`look/${item.id}`) });
 const wardrobe = createWardrobe({ el: $('#wardrobe'), manifest, projects: visit, site, onOpen: item => navigate(`look/${item.id}`) });
 const viewer = createViewer({

@@ -27,9 +27,10 @@ const FFMPEG = ffmpegPath;
 const IMG_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif']);
 const VID_EXT = new Set(['.mov', '.mp4', '.m4v']);
 const TIER = {
+  smallH: 600, smallQ: 74,
   railH: 1200, railQ: 78,
   fullLong: 2560, fullQ: 86,
-  teaserSec: 12, teaserH: 720, teaserCrf: 28,
+  teaserSec: 12, teaserH: 720, teaserCrf: 28, teaserSmallH: 480, teaserSmallCrf: 30,
   fullShort: 1080, fullCrf: 22,
 };
 const BUDGET = { railPhotoAvg: 220e3, railTeaser: 2.5e6, fullPhoto: 900e3, fullVideoPerSec: 0.6e6 };
@@ -141,10 +142,11 @@ async function orientedSize(input) {
   const swap = m.orientation && m.orientation >= 5;
   return { w: swap ? m.height : m.width, h: swap ? m.width : m.height };
 }
-async function buildPhoto(input, outRail, outFull) {
+async function buildPhoto(input, outRail, outFull, outSmall) {
   const r = await sharp(input).rotate().resize({ height: TIER.railH, withoutEnlargement: true }).webp({ quality: TIER.railQ, effort: 5 }).toFile(outRail);
   const f = await sharp(input).rotate().resize({ width: TIER.fullLong, height: TIER.fullLong, fit: 'inside', withoutEnlargement: true }).webp({ quality: TIER.fullQ, effort: 5 }).toFile(outFull);
-  return { rail: { w: r.width, h: r.height }, full: { w: f.width, h: f.height } };
+  const sm = outSmall ? await sharp(input).rotate().resize({ height: TIER.smallH, withoutEnlargement: true }).webp({ quality: TIER.smallQ, effort: 5 }).toFile(outSmall) : null;
+  return { rail: { w: r.width, h: r.height }, full: { w: f.width, h: f.height }, small: sm ? { w: sm.width, h: sm.height } : null };
 }
 async function probeVideo(src) {
   const { stdout } = await run(FFPROBE, ['-v', 'error', '-show_streams', '-show_format', '-of', 'json', src]);
@@ -159,10 +161,14 @@ async function buildVideo(src, info, teaserStart, outRail, outFull, outPosterRai
   const common = ['-y', '-hide_banner', '-loglevel', 'error', '-map_metadata', '-1', '-map_chapters', '-1', '-movflags', '+faststart', '-pix_fmt', 'yuv420p'];
   const fps = Math.min(30, info.fps);
   const start = Math.max(0, Math.min(teaserStart, Math.max(0, info.duration - TIER.teaserSec)));
-  // rail teaser
+  // rail teaser + small teaser
   await run(FFMPEG, ['-ss', String(start), '-t', String(TIER.teaserSec), '-i', src,
     '-vf', `scale=-2:'min(${TIER.teaserH},ih)',fps=${fps}`,
     '-an', '-c:v', 'libx264', '-crf', String(TIER.teaserCrf), '-preset', 'slow', '-profile:v', 'high', ...common, outRail]);
+  const outSmall = outRail.replace('/rail/', '/small/');
+  await run(FFMPEG, ['-ss', String(start), '-t', String(TIER.teaserSec), '-i', src,
+    '-vf', `scale=-2:'min(${TIER.teaserSmallH},ih)',fps=${Math.min(24, fps)}`,
+    '-an', '-c:v', 'libx264', '-crf', String(TIER.teaserSmallCrf), '-preset', 'slow', '-profile:v', 'high', ...common, outSmall]);
   // full
   const fullArgs = ['-i', src, '-vf', `scale='if(gt(iw,ih),-2,min(${TIER.fullShort},iw))':'if(gt(iw,ih),min(${TIER.fullShort},ih),-2)'`,
     '-c:v', 'libx264', '-crf', String(TIER.fullCrf), '-preset', 'slow', '-profile:v', 'high', '-maxrate', '6M', '-bufsize', '12M'];
@@ -316,11 +322,11 @@ async function main() {
   const meta = await readJSON(join(CONTENT, 'meta.json'), { projects: {}, items: {} });
   meta.projects ||= {}; meta.items ||= {};
   const cache = await readJSON(CACHE_FILE, {});
-  for (const d of ['rail', 'full', 'poster']) await mkdir(join(MEDIA, d), { recursive: true });
+  for (const d of ['rail', 'full', 'poster', 'small']) await mkdir(join(MEDIA, d), { recursive: true });
 
   const { projects, report } = await scan();
   const warnings = []; const referenced = new Set();
-  const stats = { rail: 0, full: 0, poster: 0, railPhotoN: 0, railPhotoBytes: 0 };
+  const stats = { rail: 0, full: 0, poster: 0, small: 0, railPhotoN: 0, railPhotoBytes: 0 };
   const manifest = { generated: new Date().toISOString(), site, projects: [], items: [] };
 
   // meta scaffolds (never overwrite existing entries)
@@ -348,33 +354,34 @@ async function main() {
     const srcM = await mtime(it.path);
     const entry = { id: it.id, project: p.slug, type: it.type, onRail: false, caption: im.caption || '' };
     if (it.type === 'photo') {
-      const outR = join(MEDIA, 'rail', `${it.id}.webp`), outF = join(MEDIA, 'full', `${it.id}.webp`);
-      referenced.add(outR); referenced.add(outF);
+      const outR = join(MEDIA, 'rail', `${it.id}.webp`), outF = join(MEDIA, 'full', `${it.id}.webp`), outS = join(MEDIA, 'small', `${it.id}.webp`);
+      referenced.add(outR); referenced.add(outF); referenced.add(outS);
       const input = await imageInput(it.path);
       const { w, h } = await orientedSize(input);
       entry.w = w; entry.h = h;
       if (Math.max(w, h) < 1600) report.small.push(`${it.key}  (${w}×${h})`);
-      const fresh = (await mtime(outR)) > srcM && (await mtime(outF)) > srcM && cache[it.id]?.rail;
-      if (fresh) { Object.assign(entry, { rail: cache[it.id].rail, full: cache[it.id].full }); }
+      const fresh = (await mtime(outR)) > srcM && (await mtime(outF)) > srcM && (await mtime(outS)) > srcM && cache[it.id]?.rail && cache[it.id]?.small;
+      if (fresh) { Object.assign(entry, { rail: cache[it.id].rail, full: cache[it.id].full, small: cache[it.id].small }); }
       else {
-        const s = await buildPhoto(input, outR, outF);
-        entry.rail = s.rail; entry.full = s.full;
-        cache[it.id] = { rail: s.rail, full: s.full };
+        const s = await buildPhoto(input, outR, outF, outS);
+        entry.rail = s.rail; entry.full = s.full; entry.small = s.small;
+        cache[it.id] = { rail: s.rail, full: s.full, small: s.small };
       }
+      entry.small = { src: `media/small/${it.id}.webp?v=${v}`, w: entry.small.w, h: entry.small.h };
       entry.rail = { src: `media/rail/${it.id}.webp?v=${v}`, w: entry.rail.w, h: entry.rail.h };
       entry.full = { src: `media/full/${it.id}.webp?v=${v}`, w: entry.full.w, h: entry.full.h };
       const rs = await fsize(outR), fs = await fsize(outF);
-      stats.rail += rs; stats.full += fs; stats.railPhotoN++; stats.railPhotoBytes += rs;
+      stats.rail += rs; stats.full += fs; stats.small += await fsize(outS); stats.railPhotoN++; stats.railPhotoBytes += rs;
       if (fs > BUDGET.fullPhoto) warnings.push(`full photo over budget: ${it.id}.webp ${fmtKB(fs)}`);
     } else {
-      const outR = join(MEDIA, 'rail', `${it.id}.mp4`), outF = join(MEDIA, 'full', `${it.id}.mp4`);
+      const outR = join(MEDIA, 'rail', `${it.id}.mp4`), outF = join(MEDIA, 'full', `${it.id}.mp4`), outS = join(MEDIA, 'small', `${it.id}.mp4`);
       const pR = join(MEDIA, 'poster', `${it.id}-rail.webp`), pF = join(MEDIA, 'poster', `${it.id}-full.webp`);
-      for (const o of [outR, outF, pR, pF]) referenced.add(o);
+      for (const o of [outR, outF, pR, pF, outS]) referenced.add(o);
       const info = await probeVideo(it.path);
       entry.w = info.w; entry.h = info.h; entry.duration = Math.round(info.duration * 10) / 10; entry.hasAudio = info.hasAudio;
       const ts = Number(im.teaserStart) || 0;
       const c = cache[it.id];
-      const fresh = c && c.teaserStart === ts && (await Promise.all([outR, outF, pR, pF].map(mtime))).every(m => m > srcM);
+      const fresh = c && c.teaserStart === ts && c.small && (await Promise.all([outR, outF, pR, pF, outS].map(mtime))).every(m => m > srcM);
       let sizes;
       if (fresh) sizes = c;
       else {
@@ -382,17 +389,19 @@ async function main() {
           // poster from the still image
           const input = await imageInput(it.poster.path);
           await run(FFMPEG, ['-y', '-hide_banner', '-loglevel', 'error', '-i', it.path, '-vf', `scale=-2:'min(${TIER.teaserH},ih)'`, '-an', '-c:v', 'libx264', '-crf', String(TIER.teaserCrf), '-preset', 'slow', '-map_metadata', '-1', '-movflags', '+faststart', '-pix_fmt', 'yuv420p', outR]);
+          await run(FFMPEG, ['-y', '-hide_banner', '-loglevel', 'error', '-i', it.path, '-vf', `scale=-2:'min(${TIER.teaserSmallH},ih)'`, '-an', '-c:v', 'libx264', '-crf', String(TIER.teaserSmallCrf), '-preset', 'slow', '-map_metadata', '-1', '-movflags', '+faststart', '-pix_fmt', 'yuv420p', outS]);
           await run(FFMPEG, ['-y', '-hide_banner', '-loglevel', 'error', '-i', it.path, '-vf', `scale='if(gt(iw,ih),-2,min(${TIER.fullShort},iw))':'if(gt(iw,ih),min(${TIER.fullShort},ih),-2)'`, '-c:v', 'libx264', '-crf', String(TIER.fullCrf), '-preset', 'slow', '-an', '-map_metadata', '-1', '-movflags', '+faststart', '-pix_fmt', 'yuv420p', outF]);
           const s = await buildPhoto(input, pR, pF);
           sizes = { posterRail: s.rail, posterFull: s.full };
         } else {
           sizes = await buildVideo(it.path, info, ts, outR, outF, pR, pF);
         }
-        sizes.rail = await videoSize(outR); sizes.full = await videoSize(outF); sizes.teaserStart = ts;
+        sizes.rail = await videoSize(outR); sizes.full = await videoSize(outF); sizes.small = existsSync(outS) ? await videoSize(outS) : null; sizes.teaserStart = ts;
         cache[it.id] = sizes;
       }
       entry.rail = { src: `media/rail/${it.id}.mp4?v=${v}`, w: sizes.rail.w, h: sizes.rail.h };
       entry.full = { src: `media/full/${it.id}.mp4?v=${v}`, w: sizes.full.w, h: sizes.full.h };
+      if (sizes.small) entry.small = { src: `media/small/${it.id}.mp4?v=${v}`, w: sizes.small.w, h: sizes.small.h };
       entry.poster = { rail: `media/poster/${it.id}-rail.webp?v=${v}`, full: `media/poster/${it.id}-full.webp?v=${v}`, w: sizes.posterRail.w, h: sizes.posterRail.h };
       const rs = await fsize(outR), fs = await fsize(outF);
       stats.rail += rs; stats.full += fs; stats.poster += (await fsize(pR)) + (await fsize(pF));
@@ -420,7 +429,7 @@ async function main() {
 
   // remove orphan outputs (only inside public/media)
   const removed = [];
-  for (const d of ['rail', 'full', 'poster']) {
+  for (const d of ['rail', 'full', 'poster', 'small']) {
     for (const f of await readdir(join(MEDIA, d))) {
       const p = join(MEDIA, d, f);
       if (!referenced.has(p)) { await unlink(p); removed.push(`${d}/${f}`); }
@@ -448,7 +457,7 @@ async function main() {
   console.log(`\n== media report (${((Date.now() - t0) / 1000).toFixed(1)} s) ==`);
   console.log(`projects: ${manifest.projects.length}, items: ${results.length} (${photos} photo, ${motion} motion)`);
   for (const p of manifest.projects) console.log(`  ${String(p.count).padStart(3)}  ${p.category} / ${p.title}  [${p.slug}]`);
-  console.log(`tiers: rail ${fmtMB(stats.rail)} (photo avg ${fmtKB(avgRail)}), full ${fmtMB(stats.full)}, poster ${fmtMB(stats.poster)}`);
+  console.log(`tiers: small ${fmtMB(stats.small)}, rail ${fmtMB(stats.rail)} (photo avg ${fmtKB(avgRail)}), full ${fmtMB(stats.full)}, poster ${fmtMB(stats.poster)}`);
   if (report.empty.length) console.log(`empty folders (skipped): ${report.empty.join('; ')}`);
   if (report.dupes.length) console.log(`duplicates (skipped):\n  ${report.dupes.join('\n  ')}`);
   if (report.small.length) console.log(`sources below 1600px (HQ will be soft):\n  ${report.small.join('\n  ')}`);
