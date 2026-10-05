@@ -139,7 +139,8 @@ onRoute(route => {
   else if (route.name === 'contact') { showLayer('contact'); wardrobe.close(); strip.resume(); }
   else { showLayer(null); wardrobe.close(); strip.resume(); }
 });
-addEventListener('keydown', e => { if (e.key === 'Escape' && !viewer.isOpen && layerOpen) back(''); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && !viewer.isOpen && layerOpen) back(''); if (e.key === 'Tab') document.body.classList.add('kb'); });
+addEventListener('pointerdown', () => document.body.classList.remove('kb'), true);
 // leaving a shoot: tap the empty paper around the band, pull the band down, or press its title
 const closeProject = () => { if (layerOpen === 'project') back(''); };
 $('#project-stage').addEventListener('tapout', closeProject);
