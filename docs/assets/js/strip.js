@@ -47,14 +47,16 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   }
   // phone: frames glued edge to edge in one row, each a random height, centred on the band line
   function layoutTight(list) {
+    // one axis across the screen; every frame hangs on it with a small offset, so neighbours always overlap by well over half
     const topSafe = 24, bottomSafe = Math.max(vh * 0.1, 96);
     const free = vh - topSafe - bottomSafe;
+    const axis = topSafe + free * (0.44 + rnd(list[0]?.item || {}).c * 0.12);   // 44–56% of the free band, chosen per visit
     let x = 0;
     for (const node of list) {
       const r = rnd(node.item), ar = node.item.w / node.item.h;
       let h = vh * (0.25 + r.a * 0.085), w = h * ar;          // a quarter to a third of the screen height
       if (w > vw * 0.96) { w = vw * 0.96; h = w / ar; }
-      const top = topSafe + r.b * (free - h);                 // anywhere in the free band, so the row runs ragged
+      const top = axis - h / 2 + (r.b - 0.5) * 0.4 * h;      // centre within ±20% of its own height from the axis
       place(node, x, top, w, h); x += node.w;
       node.depth = 0;
     }
