@@ -48,13 +48,14 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   // phone: frames glued edge to edge in one row, each a random height, centred on the band line
   function layoutTight(list) {
     const topSafe = 24, bottomSafe = Math.max(vh * 0.1, 96);
-    const free = vh - topSafe - bottomSafe, mid = topSafe + free / 2;
+    const free = vh - topSafe - bottomSafe;
     let x = 0;
     for (const node of list) {
       const r = rnd(node.item), ar = node.item.w / node.item.h;
-      let h = free * (0.55 + r.a * 0.45), w = h * ar;
-      if (w > vw * 1.35) { w = vw * 1.35; h = w / ar; }   // wide frames may run a little past the screen
-      place(node, x, mid - h / 2 + (r.b - 0.5) * (free - h) * 0.6, w, h); x += node.w;
+      let h = vh * (0.25 + r.a * 0.085), w = h * ar;          // a quarter to a third of the screen height
+      if (w > vw * 0.96) { w = vw * 0.96; h = w / ar; }
+      const top = topSafe + r.b * (free - h);                 // anywhere in the free band, so the row runs ragged
+      place(node, x, top, w, h); x += node.w;
       node.depth = 0;
     }
     return x;
@@ -71,23 +72,18 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
       // every column gets its own vertical band: a different top edge and a different height
       const r = lead;
       const free = vh - topSafe - bottomSafe;
-      const bandH = free * (0.68 + r.b * 0.32);          // 68–100% of the free height
+      const bandH = free * (0.55 + r.b * 0.45);          // 55–100% of the free height: columns differ in height and position
       const bandTop = topSafe + r.c * Math.max(0, free - bandH);
       const vgap = Math.round(vh * (0.015 + r.d * 0.03));
-      // size the column; if width-capped landscape frames leave the band mostly empty, pull in more frames
-      let col, sizes, used;
-      for (let n = Math.min(want, list.length - i); ; n++) {
-        col = list.slice(i, i + n);
-        const weights = col.map(x => 0.5 + rnd(x.item).b * 1.1), sum = weights.reduce((a, b) => a + b, 0);
-        const avail = bandH - vgap * (col.length - 1);
-        sizes = col.map((x, j) => {
-          const ar = x.item.w / x.item.h; let h = Math.max(minH, avail * weights[j] / sum), w = h * ar;
-          if (w > maxW) { w = maxW; h = w / ar; }
-          return { w, h };
-        });
-        used = sizes.reduce((a, sz) => a + sz.h, 0) + vgap * (col.length - 1);
-        if (used >= bandH * 0.78 || n >= 5 || i + n >= list.length) break;
-      }
+      const col = list.slice(i, i + Math.min(want, list.length - i));
+      const weights = col.map(x => 0.5 + rnd(x.item).b * 1.1), sum = weights.reduce((a, b) => a + b, 0);
+      const avail = bandH - vgap * (col.length - 1);
+      const sizes = col.map((x, j) => {
+        const ar = x.item.w / x.item.h; let h = Math.max(minH, avail * weights[j] / sum), w = h * ar;
+        if (w > maxW) { w = maxW; h = w / ar; }
+        return { w, h };
+      });
+      let used = sizes.reduce((a, sz) => a + sz.h, 0) + vgap * (col.length - 1);
       if (used > bandH) { const k = (bandH - vgap * (col.length - 1)) / (used - vgap * (col.length - 1)); for (const sz of sizes) { sz.w *= k; sz.h *= k; } used = bandH; }
       const colW = Math.max(...sizes.map(s => s.w));
       let y = bandTop + rnd(col[col.length - 1].item).c * Math.max(0, bandH - used);
