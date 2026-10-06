@@ -45,8 +45,23 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     }
     return x;
   }
+  // phone: frames glued edge to edge in one row, each a random height, centred on the band line
+  function layoutTight(list) {
+    const topSafe = 24, bottomSafe = Math.max(vh * 0.1, 96);
+    const free = vh - topSafe - bottomSafe, mid = topSafe + free / 2;
+    let x = 0;
+    for (const node of list) {
+      const r = rnd(node.item), ar = node.item.w / node.item.h;
+      let h = free * (0.55 + r.a * 0.45), w = h * ar;
+      if (w > vw * 1.35) { w = vw * 1.35; h = w / ar; }   // wide frames may run a little past the screen
+      place(node, x, mid - h / 2 + (r.b - 0.5) * (free - h) * 0.6, w, h); x += node.w;
+      node.depth = 0;
+    }
+    return x;
+  }
   function layoutScatter(list) {
     const phone = vw < 700, tall = vh > vw;
+    if (phone) return layoutTight(list);
     const maxW = vw * (phone ? 0.92 : 0.46), minH = vh * (phone ? 0.16 : 0.14);
     const topSafe = phone ? 28 : 36, bottomSafe = Math.max(vh * 0.1, phone ? 104 : 116);   // nav + seal band below: photos never touch it
     let x = vw * 0.04, i = 0;
@@ -169,14 +184,15 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   function tick(now) {
     const dt = Math.min(50, now - last || 16.67); last = now;
     // glide: once the wheel goes quiet, the smoothed input speed keeps pushing the target and decays
-    if (inVel && now - lastInput > 40) { target += inVel * dt / 1000; inVel *= Math.pow(0.0009, dt / 1000); if (Math.abs(inVel) < 8) inVel = 0; }
+    if (inVel && now - lastInput > 40) { target += inVel * dt / 1000; inVel *= Math.pow(vw < 700 ? 0.00002 : 0.0009, dt / 1000); if (Math.abs(inVel) < 8) inVel = 0; }
     if (drift && !ptr && !REDUCED.matches) {
       // after arrival the drift eases from 0 to its peak over 35 s; after any touch it waits 3 s, then eases in again
       const t = Math.max(0, Math.min(1, (now - lastTouch - 3000) / 35000)), ease = t * t * (3 - 2 * t);
       target += driftDir * drift * ease * dt / 1000;
     }
     if (!looping) target = Math.max(0, Math.min(maxPos(), target));
-    const lerp = REDUCED.matches ? 0.35 : 0.085;
+    const phone = vw < 700;
+    const lerp = REDUCED.matches ? 0.35 : phone ? 0.3 : 0.085;
     pos += (target - pos) * (1 - Math.pow(1 - lerp, dt / 16.67));
     if (Math.abs(target - pos) < 0.05) pos = target;
     dragY += (dragYTarget - dragY) * (1 - Math.pow(0.8, dt / 16.67));
@@ -236,7 +252,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   const endPtr = e => {
     if (!ptr || e.pointerId !== ptr.id) return;
     const s = ptr.samples;
-    if (s.length >= 2) { const a = s[0], b = s[s.length - 1]; const v = (b.p - a.p) / Math.max(1, b.t - a.t) * 1000; if (Math.abs(v) > 50) { inVel = v * 0.9; lastInput = 0; } }
+    if (s.length >= 2) { const a = s[0], b = s[s.length - 1]; const v = (b.p - a.p) / Math.max(1, b.t - a.t) * 1000; if (Math.abs(v) > 50) { inVel = v * (vw < 700 ? 0.45 : 0.9); lastInput = 0; } }
     const { moved, hit, axis, sy } = ptr; ptr = null; stage.classList.remove('dragging'); lastTouch = performance.now();
     suppressClick = true; setTimeout(() => { suppressClick = false; }, 0);
     if (swipeDown && axis === 'y') {

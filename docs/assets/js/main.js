@@ -64,7 +64,17 @@ selected = [...pinned, ...selected.filter(i => !pinned.includes(i))];
 const $ = s => document.querySelector(s);
 const navGallery = $('#nav-gallery'), navContact = $('#nav-contact');
 const labelGallery = site.labels?.gallery || 'wardrobe', labelContact = site.labels?.contact || 'contact';
-navGallery.textContent = labelGallery; navContact.textContent = labelContact;
+// each letter is its own span so the active link can shimmer and assemble letter by letter
+function letters(a, text) {
+  a.textContent = '';
+  [...text].forEach((ch, i) => { const sp = document.createElement('span'); sp.textContent = ch; sp.style.setProperty('--i', i); sp.style.setProperty('--f', (Math.random() * 2.4).toFixed(2) + 's'); sp.style.setProperty('--dx', ((Math.random() - 0.5) * 14).toFixed(1) + 'px'); sp.style.setProperty('--dy', ((Math.random() - 0.5) * 10).toFixed(1) + 'px'); a.appendChild(sp); });
+}
+letters(navGallery, labelGallery); letters(navContact, labelContact);
+function setOn(a, on) {
+  if (on === a.classList.contains('on')) return;
+  if (on) { a.classList.add('scatter'); void a.offsetWidth; a.classList.add('on'); requestAnimationFrame(() => requestAnimationFrame(() => a.classList.remove('scatter'))); }
+  else { a.classList.add('scatter'); setTimeout(() => { a.classList.remove('on'); a.classList.remove('scatter'); }, 420); }
+}
 const tidy = s => (s && /^TODO/i.test(s)) ? s.replace(/^TODO:?\s*/i, '') : (s || '');
 const role = tidy(site.role);
 document.title = [site.name, role].filter(Boolean).join(' — ');
@@ -106,8 +116,8 @@ function showLayer(which) {
   document.body.classList.toggle('wardrobe-open', which === 'wardrobe');
   navGallery.setAttribute('href', which === 'wardrobe' ? '#/' : '#/wardrobe');
   navContact.setAttribute('href', which === 'contact' ? '#/' : '#/contact');
-  navGallery.classList.toggle('on', which === 'wardrobe');
-  navContact.classList.toggle('on', which === 'contact');
+  setOn(navGallery, which === 'wardrobe');
+  setOn(navContact, which === 'contact');
 }
 function openProject(p) {
   if (currentProject !== p) { currentProject = p; projectStrip.setItems(p.itemObjs); }
@@ -152,7 +162,7 @@ $('#p-title').addEventListener('click', e => { if (!currentProject?.link) { e.pr
   let lastIdx = -1, timer = 0;
   const rnd = (a, b) => a + Math.random() * (b - a);
   const next = () => {
-    if (!loops.length || document.hidden || REDUCED.matches) return;
+    if (!loops.length || document.hidden || REDUCED.matches || !video.offsetParent) return;
     let i; do { i = Math.floor(Math.random() * loops.length); } while (loops.length > 1 && i === lastIdx);
     lastIdx = i; video.src = loops[i]; video.playbackRate = rnd(0.9, 1.0);
     video.play().then(() => video.classList.add('on')).catch(() => {});
