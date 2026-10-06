@@ -91,7 +91,7 @@ const contactEl = $('#contact');
 }
 
 // ---- strips
-const strip = createStrip({ items: selected, stage: $('#stage'), loop: true, layout: 'scatter', drift: 6, depth: 0.05, maxTier: 'rail', onOpen: item => navigate(`p/${item.projectObj.slug}`) });
+const strip = createStrip({ items: selected, stage: $('#stage'), loop: true, layout: 'scatter', drift: 6, depth: 0.05, maxTier: innerWidth >= 1100 ? 'full' : 'rail', onOpen: item => navigate(`p/${item.projectObj.slug}`) });
 const projectStrip = createStrip({ items: [], stage: $('#project-stage'), loop: false, loopIfWide: true, layout: 'band', swipeDown: true, onOpen: item => navigate(`look/${item.id}`) });
 const wardrobe = createWardrobe({ el: $('#wardrobe'), manifest, projects: visit, site, onOpen: item => navigate(`look/${item.id}`) });
 const viewer = createViewer({

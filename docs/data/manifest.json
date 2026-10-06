@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-04T02:33:25.183Z",
+  "generated": "2026-10-06T14:03:13.583Z",
   "site": {
     "name": "mila harys",
     "role": "TODO: stylist · art direction · model",
@@ -3289,8 +3289,8 @@
       "hasAudio": true,
       "rail": {
         "src": "media/rail/promo-video-for-kontrkult-x-alexandriyskyi-theatre-58e771.mp4?v=58e771",
-        "w": 1280,
-        "h": 720
+        "w": 1920,
+        "h": 1080
       },
       "full": {
         "src": "media/full/promo-video-for-kontrkult-x-alexandriyskyi-theatre-58e771.mp4?v=58e771",
@@ -3321,8 +3321,8 @@
       "hasAudio": true,
       "rail": {
         "src": "media/rail/promovideo-for-kontrkult-face2face-e3f389.mp4?v=e3f389",
-        "w": 406,
-        "h": 720
+        "w": 608,
+        "h": 1080
       },
       "full": {
         "src": "media/full/promovideo-for-kontrkult-face2face-e3f389.mp4?v=e3f389",

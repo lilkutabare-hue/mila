@@ -27,10 +27,10 @@ const FFMPEG = ffmpegPath;
 const IMG_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif']);
 const VID_EXT = new Set(['.mov', '.mp4', '.m4v']);
 const TIER = {
-  smallH: 600, smallQ: 74,
-  railH: 1200, railQ: 78,
+  smallH: 600, smallQ: 80,
+  railH: 1200, railQ: 84,
   fullLong: 2560, fullQ: 86,
-  teaserSec: 12, teaserH: 720, teaserCrf: 28, teaserSmallH: 480, teaserSmallCrf: 30,
+  teaserSec: 12, teaserH: 1080, teaserCrf: 27, teaserSmallH: 480, teaserSmallCrf: 30,
   fullShort: 1080, fullCrf: 22,
 };
 const BUDGET = { railPhotoAvg: 220e3, railTeaser: 2.5e6, fullPhoto: 900e3, fullVideoPerSec: 0.6e6 };
