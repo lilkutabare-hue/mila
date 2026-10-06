@@ -103,14 +103,15 @@ export function createWardrobe({ el, manifest, projects, site, onOpen }) {
       const v = document.createElement('video');
       v.muted = true; v.playsInline = true; v.loop = true; v.preload = 'none';
       v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
-      v.poster = item.poster[pickTier(item, t.w, t.h)]; v.src = item.rail.src;
+      const pt = pickTier(item, t.w, t.h); v.poster = item.poster[pt === 'full' ? 'full' : 'rail']; v.src = (pt === 'small' && item.small ? item.small : item.rail).src;
       t.el.classList.add('loaded'); t.el.prepend(v); vio.observe(t.el);
     }
   }
+  const RANK = { small: 0, rail: 1, full: 2 };
   function upgrade(t) {
     if (t.item.type !== 'photo' || t.tier === 'full') return;
     const want = pickTier(t.item, t.w, t.h);
-    if (want === 'full') { t.tier = 'full'; const img = t.el.querySelector('img'); if (img) img.src = t.item.full.src; }
+    if (RANK[want] > RANK[t.tier]) { t.tier = want; const img = t.el.querySelector('img'); if (img) img.src = t.item[want].src; }
   }
 
   let rt = 0;
