@@ -1,5 +1,6 @@
 // Page markup for embeds (Tilda T123 etc.): main.js injects this when #stage is missing.
-export const MARKUP = `<main id="stage" class="stage strip" aria-label="selected works"><div class="track"></div></main>
+export const MARKUP = `<div class="mh-bg" aria-hidden="true"></div>
+<main id="stage" class="stage strip" aria-label="selected works"><div class="track"></div></main>
 
 <section id="project" class="layer project" aria-label="shoot" hidden>
   <a class="p-title" id="p-title" href="#"></a>

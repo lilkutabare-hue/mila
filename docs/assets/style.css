@@ -22,13 +22,11 @@ img,video{display:block}
 .nav{position:fixed;left:0;right:0;bottom:calc(22px + var(--sai-b));z-index:40;display:flex;justify-content:center;align-items:center;gap:34px;font-size:11px;line-height:16px;letter-spacing:.02em;color:#fff;mix-blend-mode:difference;pointer-events:none}
 .nav-gap{display:none}
 .nav a{pointer-events:auto;position:relative;padding:12px 8px;margin:-12px -8px}
-/* active link: letters assemble from scattered points and keep a faint shimmer; leaving, they scatter again */
-.nav a span{display:inline-block;white-space:pre;transition:transform .42s cubic-bezier(.2,.7,.2,1) calc(var(--i) * 28ms),opacity .42s calc(var(--i) * 28ms),filter .42s calc(var(--i) * 28ms)}
-.nav a.scatter span{transform:translate(var(--dx),var(--dy)) scale(.6);opacity:0;filter:blur(1.5px)}
-.nav a.on:not(.scatter) span{animation:shimmer 2.6s ease-in-out var(--f) infinite}
-@keyframes shimmer{0%,100%{opacity:1}35%{opacity:.55}60%{opacity:.9}}
-@media (hover:hover){ .nav a:hover{opacity:.7} }
-@media (prefers-reduced-motion:reduce){ .nav a span{transition:none;animation:none !important} .nav a.scatter span{transform:none;opacity:1;filter:none} .nav a.on{text-decoration:underline;text-underline-offset:3px} }
+/* active link: a slow, quiet pulse of the whole word */
+.nav a.on{animation:pulse 3.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@media (hover:hover){ .nav a:hover{opacity:.6} }
+@media (prefers-reduced-motion:reduce){ .nav a.on{animation:none;text-decoration:underline;text-underline-offset:3px} }
 /* wardrobe scrolls under the nav: give the nav a paper floor there */
 body.wardrobe-open .nav{bottom:0;padding:30px 0 calc(22px + var(--sai-b));mix-blend-mode:normal;color:var(--ink);background:linear-gradient(to top,var(--paper) 62%,rgba(242,240,235,0))}
 
@@ -48,6 +46,9 @@ body.wardrobe-open .nav{bottom:0;padding:30px 0 calc(22px + var(--sai-b));mix-bl
 @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
 @media (max-width:899px){ .seal{width:40px;height:40px;margin-left:-20px;bottom:calc(20px + var(--sai-b))} .nav-gap{width:84px} }
 @media (prefers-reduced-motion:reduce){ .seal{animation:none;opacity:1} }
+
+/* opaque paper under everything: hides whatever the host page (Tilda) renders above the body */
+.mh-bg{position:fixed;inset:0;z-index:0;background:var(--paper)}
 
 /* ===== strip ===== */
 .stage{position:fixed;inset:0;overflow:hidden;touch-action:pinch-zoom;cursor:grab;user-select:none;-webkit-user-select:none;z-index:1;background:var(--paper)}

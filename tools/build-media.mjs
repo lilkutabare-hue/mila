@@ -315,6 +315,26 @@ ${list}
   await writeFile(file, html);
 }
 
+// ---------- code version: hash of js+css → data/version.txt, and every relative import carries it ----------
+async function stampVersion() {
+  const jsDir = join(PUB, 'assets', 'js');
+  const files = (await readdir(jsDir)).filter(f => f.endsWith('.js')).sort();
+  const h = createHash('sha1');
+  for (const f of files) h.update((await readFile(join(jsDir, f), 'utf8')).replace(/\?v=[a-z0-9]+/g, ''));
+  h.update(await readFile(join(PUB, 'assets', 'style.css'), 'utf8'));
+  const v = h.digest('hex').slice(0, 8);
+  for (const f of files) {
+    const src = await readFile(join(jsDir, f), 'utf8');
+    const out = src.replace(/(from\s+'\.\/[a-z-]+\.js)(\?v=[a-z0-9]+)?'/g, `$1?v=${v}'`).replace(/(import\('\.\/[a-z-]+\.js)(\?v=[a-z0-9]+)?'/g, `$1?v=${v}'`);
+    if (out !== src) await writeFile(join(jsDir, f), out);
+  }
+  await writeFile(join(PUB, 'data', 'version.txt'), v + '\n');
+  let html = await readFile(join(PUB, 'index.html'), 'utf8');
+  html = html.replace(/assets\/style\.css(\?v=[a-z0-9]+)?/g, `assets/style.css?v=${v}`);
+  await writeFile(join(PUB, 'index.html'), html);
+  return v;
+}
+
 // ---------- main ----------
 async function main() {
   const t0 = Date.now();
@@ -448,6 +468,7 @@ async function main() {
   if (seal) await buildBrandFromSeal(seal, site); else if (frames.length) await buildBranding(frames, site);
   await writeJSON(join(PUB, 'data', 'manifest.json'), manifest);
   await injectHtml(site, manifest, byId);
+  const codeV = await stampVersion();
   if (tmpDir) await rm(tmpDir, { recursive: true, force: true });
 
   // report
@@ -465,7 +486,7 @@ async function main() {
   if (warnings.length) console.log(`budget warnings:\n  ${warnings.join('\n  ')}`);
   const todos = Object.entries(site).filter(([, v]) => typeof v === 'string' && /^TODO/i.test(v)).map(([k]) => k);
   if (todos.length) console.log(`TODO in content/site.json: ${todos.join(', ')}`);
-  console.log('manifest → docs/data/manifest.json, scaffolds → content/meta.json, meta → docs/index.html');
+  console.log(`manifest → docs/data/manifest.json, scaffolds → content/meta.json, meta → docs/index.html, code version ${codeV}`);
 }
 
 main().catch(e => { console.error(e); process.exit(1); });

@@ -1,13 +1,13 @@
-import { createStrip } from './strip.js';
-import { createWardrobe } from './wardrobe.js';
-import { createViewer } from './viewer.js';
-import { onRoute, navigate, back } from './router.js';
-import { shuffle, esc, REDUCED } from './media.js';
+import { createStrip } from './strip.js?v=2bf590a7';
+import { createWardrobe } from './wardrobe.js?v=2bf590a7';
+import { createViewer } from './viewer.js?v=2bf590a7';
+import { onRoute, navigate, back } from './router.js?v=2bf590a7';
+import { shuffle, esc, REDUCED } from './media.js?v=2bf590a7';
 
 // When embedded elsewhere (Tilda T123), window.MH_BASE points at the hosted folder; everything loads from there.
 const BASE = (window.MH_BASE || new URL('../../', import.meta.url).href).replace(/\/?$/, '/');
 const abs = u => (u && !/^(https?:)?\/\//.test(u) ? BASE + u : u);
-import { MARKUP } from './markup.js';
+import { MARKUP } from './markup.js?v=2bf590a7';
 if (!document.getElementById('stage')) document.body.insertAdjacentHTML('beforeend', MARKUP);
 const manifest = await (await fetch(BASE + 'data/manifest.json', { cache: 'no-cache' })).json();
 const site = manifest.site || {};
@@ -64,17 +64,7 @@ selected = [...pinned, ...selected.filter(i => !pinned.includes(i))];
 const $ = s => document.querySelector(s);
 const navGallery = $('#nav-gallery'), navContact = $('#nav-contact');
 const labelGallery = site.labels?.gallery || 'wardrobe', labelContact = site.labels?.contact || 'contact';
-// each letter is its own span so the active link can shimmer and assemble letter by letter
-function letters(a, text) {
-  a.textContent = '';
-  [...text].forEach((ch, i) => { const sp = document.createElement('span'); sp.textContent = ch; sp.style.setProperty('--i', i); sp.style.setProperty('--f', (Math.random() * 2.4).toFixed(2) + 's'); sp.style.setProperty('--dx', ((Math.random() - 0.5) * 14).toFixed(1) + 'px'); sp.style.setProperty('--dy', ((Math.random() - 0.5) * 10).toFixed(1) + 'px'); a.appendChild(sp); });
-}
-letters(navGallery, labelGallery); letters(navContact, labelContact);
-function setOn(a, on) {
-  if (on === a.classList.contains('on')) return;
-  if (on) { a.classList.add('scatter'); void a.offsetWidth; a.classList.add('on'); requestAnimationFrame(() => requestAnimationFrame(() => a.classList.remove('scatter'))); }
-  else { a.classList.add('scatter'); setTimeout(() => { a.classList.remove('on'); a.classList.remove('scatter'); }, 420); }
-}
+navGallery.textContent = labelGallery; navContact.textContent = labelContact;
 const tidy = s => (s && /^TODO/i.test(s)) ? s.replace(/^TODO:?\s*/i, '') : (s || '');
 const role = tidy(site.role);
 document.title = [site.name, role].filter(Boolean).join(' — ');
@@ -116,8 +106,8 @@ function showLayer(which) {
   document.body.classList.toggle('wardrobe-open', which === 'wardrobe');
   navGallery.setAttribute('href', which === 'wardrobe' ? '#/' : '#/wardrobe');
   navContact.setAttribute('href', which === 'contact' ? '#/' : '#/contact');
-  setOn(navGallery, which === 'wardrobe');
-  setOn(navContact, which === 'contact');
+  navGallery.classList.toggle('on', which === 'wardrobe');
+  navContact.classList.toggle('on', which === 'contact');
 }
 function openProject(p) {
   if (currentProject !== p) { currentProject = p; projectStrip.setItems(p.itemObjs); }
