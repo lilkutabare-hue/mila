@@ -218,41 +218,39 @@ async function findSeal() {
 async function cutoutSeal(src, size) {
   const { data, info } = await sharp(src).resize(size, size, { fit: 'cover' }).removeAlpha().raw().toBuffer({ resolveWithObject: true });
   const W = info.width, H = info.height, C = info.channels;
-  const pick = (x, y) => { const i = (y * W + x) * C; return [data[i], data[i + 1], data[i + 2]]; };
-  const corners = [pick(8, 8), pick(W - 9, 8), pick(8, H - 9), pick(W - 9, H - 9)];
-  const paper = [0, 1, 2].map(c => corners.map(k => k[c]).sort((a, b) => a - b)[1]);
-  const alpha = Buffer.alloc(W * H);
-  let x0 = W, y0 = H, x1 = 0, y1 = 0;
-  for (let i = 0; i < W * H; i++) {
-    const r = data[i * C], g = data[i * C + 1], b = data[i * C + 2];
-    // the wax is dark, the paper and the seal's own cast shadow are light: mask by luminance, not by colour distance
-    const L = 0.299 * r + 0.587 * g + 0.114 * b, Lp = 0.299 * paper[0] + 0.587 * paper[1] + 0.114 * paper[2];
-    const a = Math.max(0, Math.min(255, Math.round((Lp * 0.56 - L) / (Lp * 0.12) * 255)));
-    alpha[i] = a;
-    if (a > 200) { const x = i % W, y = (i / W) | 0; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  // 1. wax vs everything else by colour: wax is plum (red and blue above green), paper and the cast shadow are neutral
+  const m = new Uint8Array(W * H);
+  for (let i = 0; i < W * H; i++) { const r = data[i * C], g = data[i * C + 1], b = data[i * C + 2]; m[i] = (r + b) / 2 - g > 9 && r + g + b < 560 ? 255 : 0; }
+  // 2. close holes (glossy highlights) with a wide blur + threshold
+  const { data: wide, info: wi } = await sharp(Buffer.from(m), { raw: { width: W, height: H, channels: 1 } }).blur(7).raw().toBuffer({ resolveWithObject: true });
+  for (let i = 0; i < W * H; i++) m[i] = wide[i * wi.channels] > 128 ? 255 : 0;
+  // 3. centroid, then the outline as a radius per angle: outermost wax pixel on each ray
+  let bx0 = W, by0 = H, bx1 = 0, by1 = 0; for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (m[y * W + x]) { if (x < bx0) bx0 = x; if (x > bx1) bx1 = x; if (y < by0) by0 = y; if (y > by1) by1 = y; }
+  const cx = (bx0 + bx1) / 2, cy = (by0 + by1) / 2, N = 720, R = new Float64Array(N), maxR = Math.hypot(W, H) / 2;
+  for (let k = 0; k < N; k++) {
+    const a = k / N * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a); let last = 0;
+    for (let r = 0; r < maxR; r += 0.5) { const x = Math.round(cx + ca * r), y = Math.round(cy + sa * r); if (x < 0 || y < 0 || x >= W || y >= H) break; if (m[y * W + x]) last = r; }   // outermost wax pixel: gaps inside do not matter
+    R[k] = last;
   }
-  // close small holes left by glossy highlights inside the seal: wide blur → threshold, united with the raw mask
-  const { data: wide, info: wi } = await sharp(alpha, { raw: { width: W, height: H, channels: 1 } }).blur(9).raw().toBuffer({ resolveWithObject: true });
-  for (let i = 0; i < W * H; i++) if (wide[i * wi.channels] > 150) alpha[i] = 255;
-  const { data: soft, info: si } = await sharp(alpha, { raw: { width: W, height: H, channels: 1 } }).blur(1.4).raw().toBuffer({ resolveWithObject: true });
-  const SC = si.channels;
-  // pull the edge in by a couple of pixels and paint semi-transparent pixels with the wax colour,
-  // so no paper shows as a light halo on dark browser tabs
-  let wr = 0, wg = 0, wb = 0, wn = 0;
-  for (let i = 0; i < W * H; i++) if (soft[i * SC] > 250) { wr += data[i * C]; wg += data[i * C + 1]; wb += data[i * C + 2]; wn++; }
-  const wax = wn ? [wr / wn, wg / wn, wb / wn] : [60, 30, 50];
-  const rgba = Buffer.alloc(W * H * 4);
-  for (let i = 0; i < W * H; i++) {
-    const a0 = soft[i * SC], al = Math.max(0, Math.min(255, Math.round((a0 - 110) / 110 * 255)));
-    const k = al >= 250 ? 0 : 1 - al / 255 * 0.5;          // the more transparent, the more wax colour
-    rgba[i * 4] = data[i * C] * (1 - k) + wax[0] * k; rgba[i * 4 + 1] = data[i * C + 1] * (1 - k) + wax[1] * k; rgba[i * 4 + 2] = data[i * C + 2] * (1 - k) + wax[2] * k; rgba[i * 4 + 3] = al;
+  // 4. smooth the outline: median over ±5° kills spikes, then a circular low-pass keeps the hand-poured shape but makes the line clean
+  const med = new Float64Array(N); for (let k = 0; k < N; k++) { const w = []; for (let d = -10; d <= 10; d++) w.push(R[(k + d + N) % N]); w.sort((a, b) => a - b); med[k] = w[10]; }
+  let sm = med; for (let pass = 0; pass < 3; pass++) { const t = new Float64Array(N); for (let k = 0; k < N; k++) { let acc = 0, ws = 0; for (let d = -8; d <= 8; d++) { const g = Math.exp(-d * d / 32); acc += sm[(k + d + N) % N] * g; ws += g; } t[k] = acc / ws; } sm = t; }
+  for (let k = 0; k < N; k++) sm[k] -= 1.5;                      // sit just inside the rim: no paper, no shadow
+  // 5. antialiased alpha from the smooth outline; edge pixels take the wax colour
+  let wr = 0, wg = 0, wb = 0, wn = 0; for (let i = 0; i < W * H; i++) if (m[i]) { wr += data[i * C]; wg += data[i * C + 1]; wb += data[i * C + 2]; wn++; }
+  const wax = [wr / wn, wg / wn, wb / wn];
+  const rgba = Buffer.alloc(W * H * 4); let x0 = W, y0 = H, x1 = 0, y1 = 0;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const dx = x - cx, dy = y - cy, r = Math.hypot(dx, dy); let a = Math.atan2(dy, dx); if (a < 0) a += Math.PI * 2;
+    const f = a / (Math.PI * 2) * N, k0 = Math.floor(f) % N, k1 = (k0 + 1) % N, t = f - Math.floor(f);
+    const al = Math.max(0, Math.min(1, sm[k0] * (1 - t) + sm[k1] * t - r + 0.5));
+    const i = y * W + x, k = al >= 1 ? 0 : 0.7;
+    rgba[i * 4] = data[i * C] * (1 - k) + wax[0] * k; rgba[i * 4 + 1] = data[i * C + 1] * (1 - k) + wax[1] * k; rgba[i * 4 + 2] = data[i * C + 2] * (1 - k) + wax[2] * k; rgba[i * 4 + 3] = Math.round(al * 255);
+    if (al > 0.5) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
   }
-  // square crop around the seal with 6% air
-  const side = Math.min(W, Math.round(Math.max(x1 - x0, y1 - y0) * 1.12));
-  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-  const left = Math.max(0, Math.min(W - side, Math.round(cx - side / 2))), top = Math.max(0, Math.min(H - side, Math.round(cy - side / 2)));
-  const crop = { left, top, width: side, height: side };
-  const png = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } }).extract(crop).png().toBuffer();
+  const side = Math.min(W, H, Math.round(Math.max(x1 - x0, y1 - y0) * 1.04));
+  const left = Math.max(0, Math.min(W - side, Math.round((x0 + x1) / 2 - side / 2))), top = Math.max(0, Math.min(H - side, Math.round((y0 + y1) / 2 - side / 2)));
+  const png = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } }).extract({ left, top, width: side, height: side }).png().toBuffer();
   return { png };
 }
 async function buildBrandFromSeal(sealPath, site) {
