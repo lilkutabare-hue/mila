@@ -39,7 +39,7 @@ body.wardrobe-open .nav{bottom:0;padding:30px 0 calc(22px + var(--sai-b));mix-bl
 #stage{transition:filter .5s cubic-bezier(.2,.7,.1,1),opacity .5s}
 body.project-open #stage,body.contact-open #stage{filter:blur(14px);opacity:.55}
 .track{position:absolute;inset:0;will-change:transform}
-.pic{position:absolute;left:0;top:0;display:block;background:var(--ghost);cursor:pointer;overflow:hidden;contain:strict}
+.pic{position:absolute;left:0;top:0;display:block;background:transparent;cursor:pointer;overflow:hidden;contain:strict}
 .pic.off{visibility:hidden}
 .pic img,.pic video{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s}
 .pic.loaded img,.pic.loaded video{opacity:1}
@@ -116,3 +116,8 @@ body.project-open #stage,body.contact-open #stage{filter:blur(14px);opacity:.55}
 
 /* year of a shoot: quiet, right after its name */
 .yr{color:var(--muted);margin-left:.6em;font-variant-numeric:tabular-nums}
+
+/* single-frame viewer has its own close and caption: the site nav steps aside so nothing overlaps */
+.nav{transition:opacity .2s}
+body.viewer-open .nav{opacity:0;pointer-events:none}
+.v-bottom{padding-bottom:calc(20px + var(--sai-b))}

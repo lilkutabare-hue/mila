@@ -1,5 +1,5 @@
 // Full-screen viewer: a look taken off the hanger.
-import { pickTier, preloadImage, fmtTime, pad3, esc, REDUCED } from './media.js?v=c1566379';
+import { pickTier, preloadImage, fmtTime, pad3, esc, REDUCED } from './media.js?v=79fcd37b';
 
 const EASE = 'cubic-bezier(.2,.7,.1,1)';
 
@@ -87,6 +87,7 @@ export function createViewer({ el, railRectOf, setTaken, centerRail, isOnRail, o
   }
 
   function api_open(item, items, { fromRect = null, source: src = 'rail' } = {}) {
+    document.body.classList.add('viewer-open');
     lastFocus = document.activeElement; list = items; source = src; closing = false;
     el.hidden = false; open = true;
     const fit = show(item);
@@ -102,7 +103,7 @@ export function createViewer({ el, railRectOf, setTaken, centerRail, isOnRail, o
     closeBtn.focus({ preventScroll: true });
   }
   function finish() {
-    el.classList.remove('open'); el.hidden = true; open = false;
+    el.classList.remove('open'); el.hidden = true; open = false; document.body.classList.remove('viewer-open');
     if (video) { video.pause(); video = null; }
     stage.replaceChildren(); box = null;
     if (takenId) { setTaken(takenId, false); takenId = null; }

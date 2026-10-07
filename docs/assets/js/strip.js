@@ -1,6 +1,6 @@
 // Strip: photos packed into columns that fill the whole viewport, infinite horizontal scroll.
 // One transform per frame on the track; nodes keep static left/top and only hop by loopW when they wrap.
-import { pickTier, preloadImage, REDUCED } from './media.js?v=c1566379';
+import { pickTier, preloadImage, REDUCED } from './media.js?v=79fcd37b';
 
 export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, drift = 0, depth = 0, maxTier = 'full', onOpen }) {
   let looping = loop;                      // a band loops too once it is wider than the screen
@@ -11,6 +11,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   let inVel = 0, lastInput = 0;            // smoothed input speed (px/s) for the glide after the wheel stops
   let dragY = 0, dragYTarget = 0;          // vertical pull of the whole track (swipe-down to close)
   let firstScreen = true;                  // the first frames fetched get fetchpriority=high
+  let pending = 0;                         // images in flight; the rest of the strip preloads in the background, a few at a time
   let lastTouch = performance.now();      // any input; the drift ramps up again from zero after it
   const driftDir = Math.random() < 0.5 ? -1 : 1;   // this visit's direction
 
@@ -54,7 +55,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     let x = 0;
     for (const node of list) {
       const r = rnd(node.item), ar = node.item.w / node.item.h;
-      let h = vh * (0.25 + r.a * 0.085), w = h * ar;          // a quarter to a third of the screen height
+      let h = vh * (0.19 + r.a * 0.06), w = h * ar;           // about a fifth to a quarter of the screen height
       if (w > vw * 0.96) { w = vw * 0.96; h = w / ar; }
       const top = axis - h / 2 + (r.b - 0.5) * 0.4 * h;      // centre within ±20% of its own height from the axis
       place(node, x, top, w, h); x += node.w;
@@ -133,20 +134,25 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   const maxPos = () => Math.max(0, loopW - vw);
 
   // ---------- media ----------
-  function load(node) {
+  function upgrade(node) { // swap in the 2560px version once the frame is actually near the screen
+    node.needFull = false; const img = node.media, src = node.item.full.src;
+    preloadImage(src).then(() => { if (node.el.isConnected && img === node.media) img.src = src; }).catch(() => {});
+  }
+  function load(node, background = false) {
     if (node.loaded) return; node.loaded = true;
     const { item } = node;
     if (item.type === 'photo') {
       const img = new Image(); img.decoding = 'async'; img.alt = '';
-      img.onload = () => {
-        node.el.classList.add('loaded');
-      };
-      img.onerror = () => fail(node);
+      let settled = false; const settle = () => { if (!settled) { settled = true; pending--; } };
+      pending++;
+      img.onload = () => { settle(); node.el.classList.add('loaded'); };
+      img.onerror = () => { settle(); fail(node); };
       let tier = pickTier(item, node.w, node.h);
       if (tier === 'full' && maxTier !== 'full') tier = 'rail';     // the collage never needs 2560px frames
-      if (node.visible || firstScreen) img.fetchPriority = 'high';
+      if (!background && (node.visible || firstScreen)) img.fetchPriority = 'high';
+      if (background) img.fetchPriority = 'low';
       img.src = (tier === 'full' ? item.rail : item[tier]).src; node.el.appendChild(img); node.media = img;
-      if (tier === 'full') preloadImage(item.full.src).then(() => { if (node.el.isConnected) img.src = item.full.src; }).catch(() => {});
+      if (tier === 'full') { if (background) node.needFull = true; else upgrade(node); }
     } else {
       const v = document.createElement('video');
       v.muted = true; v.playsInline = true; v.loop = true; v.preload = 'none';
@@ -199,6 +205,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     const speed = Math.abs(target - pos);        // px still to travel: the faster the flick, the further we preload
     const ahead = vw * 1.25 + Math.min(vw * 4, speed * 1.5);
     const lo = pos - pad, hi = pos + vw + pad;  // world window that may be on screen
+    let bgNode = null, bgDist = Infinity;       // nearest frame that is not loaded yet
     for (const node of nodes) {
       let left = node.x;
       if (looping) { // choose the copy of this node whose world x lies in [pos - pad, pos - pad + loopW)
@@ -209,14 +216,21 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
       const sx = left - pos + offsetX;
       const on = sx < vw + pad && sx + node.w > -pad;
       const lx = looping && sx > vw * 2 ? sx - loopW : sx;
-      if (!node.loaded && lx > -ahead && lx < ahead) load(node);
+      const nearView = lx > -ahead && lx < ahead;
+      if (!node.loaded && nearView) load(node);
+      else if (node.needFull && nearView) upgrade(node);
+      else if (!node.loaded) { const d = Math.abs(lx + node.w / 2 - vw / 2); if (d < bgDist) { bgDist = d; bgNode = node; } }
       if (on) {
         if (!node.visible) { node.visible = true; node.el.classList.remove('off'); node.el.style.willChange = 'transform'; }
         if (depth && node.depth) node.el.style.transform = `translate3d(${((sx + node.w / 2 - vw / 2) * node.depth * depth).toFixed(1)}px,0,0)`;
         if (node.item.type === 'motion') playVideo(node, (Math.min(vw, sx + node.w) - Math.max(0, sx)) / node.w);
       } else if (node.visible) { node.visible = false; node.el.classList.add('off'); node.el.style.willChange = ''; if (node.item.type === 'motion') playVideo(node, 0); }
     }
+    preloadNext(bgNode);
   }
+
+  // background preload: after the first screen has settled, keep up to three images in flight, nearest first
+  function preloadNext(node) { if (node && !firstScreen && pending < 3) load(node, true); }
 
   // ---------- input ----------
   let wheelPrev = 0;
