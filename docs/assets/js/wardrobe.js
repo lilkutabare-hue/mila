@@ -1,5 +1,5 @@
 // Wardrobe: every work, by project, justified rows, lazy HQ loading.
-import { pickTier, esc } from './media.js?v=e4bad731';
+import { pickTier, esc } from './media.js?v=f5f9a2c4';
 
 export function createWardrobe({ el, projects, onOpen }) {
   const scroll = el.querySelector('.scroll');

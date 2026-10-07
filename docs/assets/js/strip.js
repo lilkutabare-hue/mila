@@ -1,8 +1,8 @@
 // Strip: photos packed into columns that fill the whole viewport, infinite horizontal scroll.
 // One transform per frame on the track; nodes keep static left/top and only hop by loopW when they wrap.
-import { pickTier, preloadImage, REDUCED } from './media.js?v=e4bad731';
+import { pickTier, preloadImage, REDUCED } from './media.js?v=f5f9a2c4';
 
-export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, drift = 0, maxTier = 'full', onOpen }) {
+export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, maxTier = 'full', onOpen }) {
   let looping = loop;                      // a band loops too once it is wider than the screen
   const track = stage.querySelector('.track');
   let live = items.slice(), nodes = [], base = new Map();
@@ -12,8 +12,6 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   let dragY = 0, dragYTarget = 0;          // vertical pull of the whole track (swipe-down to close)
   let firstScreen = true;                  // the first frames fetched get fetchpriority=high
   let pending = 0;                         // images in flight; the rest of the strip preloads in the background, a few at a time
-  let lastTouch = performance.now();      // any input; the drift ramps up again from zero after it
-  const driftDir = Math.random() < 0.5 ? -1 : 1;   // this visit's direction
 
   // ---------- nodes ----------
   function makeNode(item, clone = false) {
@@ -184,18 +182,13 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     tick(now);
   }
   function tick(now) {
-    const dt = Math.min(50, now - last || 16.67); last = now;
+    const dt = Math.max(0, Math.min(50, now - last || 16.67)); last = now;
     // glide: once the wheel goes quiet, the smoothed input speed keeps pushing the target and decays
     if (inVel && now - lastInput > 40) { target += inVel * dt / 1000; inVel *= Math.pow(vw < 700 ? 0.00002 : 0.0009, dt / 1000); if (Math.abs(inVel) < 8) inVel = 0; }
-    if (drift && !ptr && !REDUCED.matches) {
-      // after arrival the drift eases from 0 to its peak over 35 s; after any touch it waits 3 s, then eases in again
-      const t = Math.max(0, Math.min(1, (now - lastTouch - 3000) / 35000)), ease = t * t * (3 - 2 * t);
-      target += driftDir * drift * ease * dt / 1000;
-    }
     if (!looping) target = Math.max(0, Math.min(maxPos(), target));
     const phone = vw < 700;
-    const lerp = REDUCED.matches ? 0.35 : phone ? 0.3 : 0.085;
-    pos += (target - pos) * (1 - Math.pow(1 - lerp, dt / 16.67));
+    const lerp = phone && !REDUCED.matches ? 0.3 : 1;      // wide screens: no easing, the strip moves exactly as far as it was scrolled
+    if (lerp >= 1) pos = target; else pos += (target - pos) * (1 - Math.pow(1 - lerp, dt / 16.67));
     if (Math.abs(target - pos) < 0.05) pos = target;
     dragY += (dragYTarget - dragY) * (1 - Math.pow(0.8, dt / 16.67));
     if (Math.abs(dragY - dragYTarget) < 0.1) dragY = dragYTarget;
@@ -236,17 +229,15 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     e.preventDefault();
     let d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
     if (e.deltaMode === 1) d *= 16; else if (e.deltaMode === 2) d *= vw;
-    d = Math.max(-120, Math.min(120, d));
     target += d;
-    const now = e.timeStamp, gap = Math.max(8, now - wheelPrev); wheelPrev = now; lastInput = now; lastTouch = performance.now();
-    const v = d / gap * 1000;                     // px/s of this event
-    inVel = Math.abs(v) > Math.abs(inVel) ? v * 0.6 : inVel * 0.7 + v * 0.3 * 0.6;
+    const now = e.timeStamp, gap = Math.max(8, now - wheelPrev); wheelPrev = now; lastInput = now;
+    inVel = 0;                                              // no glide after the wheel: plain scroll, sideways
   }, { passive: false });
   let ptr = null;
   stage.addEventListener('pointerdown', e => {
     if (!active || e.button !== 0) return;
     ptr = { id: e.pointerId, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, axis: e.pointerType === 'mouse' && !swipeDown ? 'x' : null, samples: [], moved: false, hit: e.target.closest('.pic') };
-    try { stage.setPointerCapture(e.pointerId); } catch {} target = pos; inVel = 0; lastTouch = performance.now();
+    try { stage.setPointerCapture(e.pointerId); } catch {} target = pos; inVel = 0;
   });
   stage.addEventListener('pointermove', e => {
     if (!ptr || e.pointerId !== ptr.id) return;
@@ -261,8 +252,8 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   const endPtr = e => {
     if (!ptr || e.pointerId !== ptr.id) return;
     const s = ptr.samples;
-    if (s.length >= 2) { const a = s[0], b = s[s.length - 1]; const v = (b.p - a.p) / Math.max(1, b.t - a.t) * 1000; if (Math.abs(v) > 50) { inVel = v * (vw < 700 ? 0.45 : 0.9); lastInput = 0; } }
-    const { moved, hit, axis, sy } = ptr; ptr = null; stage.classList.remove('dragging'); lastTouch = performance.now();
+    if (s.length >= 2) { const a = s[0], b = s[s.length - 1]; const v = (b.p - a.p) / Math.max(1, b.t - a.t) * 1000; if (Math.abs(v) > 50 && vw < 700) { inVel = v * 0.45; lastInput = 0; } }
+    const { moved, hit, axis, sy } = ptr; ptr = null; stage.classList.remove('dragging');
     suppressClick = true; setTimeout(() => { suppressClick = false; }, 0);
     if (swipeDown && axis === 'y') {
       if (e.type === 'pointerup' && e.clientY - sy > 90) { stage.dispatchEvent(new CustomEvent('swipedown')); setTimeout(() => { dragY = dragYTarget = 0; }, 400); }
@@ -284,7 +275,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
       case 'Home': target = 0; break;
       default: return;
     }
-    lastTouch = performance.now(); e.preventDefault();
+    e.preventDefault();
   });
   let rt = 0;
   const relayout = () => {
@@ -306,7 +297,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     start() { if (active) return; build(null); active = true; run(); },
     pause() { active = false; stop(); for (const n of nodes) playVideo(n, 0); },
     resume() {
-      if (active) return; active = true; lastTouch = performance.now();
+      if (active) return; active = true;
       const w = stage.clientWidth || innerWidth, h = stage.clientHeight || innerHeight;
       if (!nodes.length) build(null); else if (w !== vw || h !== vh) build(nodes.find(n => n.visible)?.item || null);
       run();

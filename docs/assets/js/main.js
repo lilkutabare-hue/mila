@@ -1,13 +1,13 @@
-import { createStrip } from './strip.js?v=e4bad731';
-import { createWardrobe } from './wardrobe.js?v=e4bad731';
-import { createViewer } from './viewer.js?v=e4bad731';
-import { onRoute, navigate, back } from './router.js?v=e4bad731';
-import { shuffle, esc } from './media.js?v=e4bad731';
+import { createStrip } from './strip.js?v=f5f9a2c4';
+import { createWardrobe } from './wardrobe.js?v=f5f9a2c4';
+import { createViewer } from './viewer.js?v=f5f9a2c4';
+import { onRoute, navigate, back } from './router.js?v=f5f9a2c4';
+import { shuffle, esc } from './media.js?v=f5f9a2c4';
 
 // When embedded elsewhere (Tilda T123), window.MH_BASE points at the hosted folder; everything loads from there.
 const BASE = (window.MH_BASE || new URL('../../', import.meta.url).href).replace(/\/?$/, '/');
 const abs = u => (u && !/^(https?:)?\/\//.test(u) ? BASE + u : u);
-import { MARKUP } from './markup.js?v=e4bad731';
+import { MARKUP } from './markup.js?v=f5f9a2c4';
 if (!document.getElementById('stage')) document.body.insertAdjacentHTML('beforeend', MARKUP);
 const manifest = await (await fetch(BASE + 'data/manifest.json', { cache: 'no-cache' })).json();
 const site = manifest.site || {};
@@ -79,7 +79,7 @@ const contactEl = $('#contact');
 }
 
 // ---- strips
-const strip = createStrip({ items: selected, stage: $('#stage'), loop: true, layout: 'scatter', drift: 6, maxTier: innerWidth >= 1100 ? 'full' : 'rail', onOpen: item => navigate(`p/${item.projectObj.slug}`) });
+const strip = createStrip({ items: selected, stage: $('#stage'), loop: true, layout: 'scatter', maxTier: innerWidth >= 1100 ? 'full' : 'rail', onOpen: item => navigate(`p/${item.projectObj.slug}`) });
 const projectStrip = createStrip({ items: [], stage: $('#project-stage'), loop: false, loopIfWide: true, layout: 'band', swipeDown: true, onOpen: item => navigate(`look/${item.id}`) });
 const wardrobe = createWardrobe({ el: $('#wardrobe'), projects: visit, onOpen: item => navigate(`look/${item.id}`) });
 const viewer = createViewer({
