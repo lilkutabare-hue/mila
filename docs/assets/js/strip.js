@@ -1,6 +1,6 @@
 // Strip: photos packed into columns that fill the whole viewport, infinite horizontal scroll.
 // One transform per frame on the track; nodes keep static left/top and only hop by loopW when they wrap.
-import { pickTier, preloadImage, REDUCED } from './media.js?v=f5f9a2c4';
+import { pickTier, preloadImage, REDUCED } from './media.js?v=4593352f';
 
 export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, maxTier = 'full', onOpen }) {
   let looping = loop;                      // a band loops too once it is wider than the screen
@@ -92,7 +92,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
         place(n, Math.round(x + dx), y, s.w, s.h);
         y += s.h + vgap;
       });
-      x += colW + vw * (phone ? 0.04 : 0.02) + rnd(col[0].item).a * vw * (phone ? 0.1 : 0.06);
+      x += colW + vw * (phone ? 0.04 : 0.01) + rnd(col[0].item).a * vw * (phone ? 0.1 : 0.03);   // wide: gaps of 1–4% of the screen
       i += col.length;
     }
     return x;
@@ -187,7 +187,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     if (inVel && now - lastInput > 40) { target += inVel * dt / 1000; inVel *= Math.pow(vw < 700 ? 0.00002 : 0.0009, dt / 1000); if (Math.abs(inVel) < 8) inVel = 0; }
     if (!looping) target = Math.max(0, Math.min(maxPos(), target));
     const phone = vw < 700;
-    const lerp = phone && !REDUCED.matches ? 0.3 : 1;      // wide screens: no easing, the strip moves exactly as far as it was scrolled
+    const lerp = REDUCED.matches ? 1 : phone ? 0.3 : 0.4;   // wide screens: a touch of easing (settles in about 100 ms), no glide
     if (lerp >= 1) pos = target; else pos += (target - pos) * (1 - Math.pow(1 - lerp, dt / 16.67));
     if (Math.abs(target - pos) < 0.05) pos = target;
     dragY += (dragYTarget - dragY) * (1 - Math.pow(0.8, dt / 16.67));
@@ -225,7 +225,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   // ---------- input ----------
   let wheelPrev = 0;
   addEventListener('wheel', e => {
-    if (!active || !stage.contains(e.target)) return;
+    if (!active || !(e.target instanceof Node) || !stage.contains(e.target)) return;
     e.preventDefault();
     let d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
     if (e.deltaMode === 1) d *= 16; else if (e.deltaMode === 2) d *= vw;
