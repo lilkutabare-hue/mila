@@ -1,8 +1,8 @@
 // Strip: photos packed into columns that fill the whole viewport, infinite horizontal scroll.
 // One transform per frame on the track; nodes keep static left/top and only hop by loopW when they wrap.
-import { pickTier, preloadImage, REDUCED } from './media.js?v=2d0c215c';
+import { pickTier, preloadImage, REDUCED } from './media.js?v=e4bad731';
 
-export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, drift = 0, depth = 0, maxTier = 'full', onOpen }) {
+export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, drift = 0, maxTier = 'full', onOpen }) {
   let looping = loop;                      // a band loops too once it is wider than the screen
   const track = stage.querySelector('.track');
   let live = items.slice(), nodes = [], base = new Map();
@@ -59,7 +59,6 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
       if (w > vw * 0.96) { w = vw * 0.96; h = w / ar; }
       const top = axis - h / 2 + (r.b - 0.5) * 0.4 * h;      // centre within ±20% of its own height from the axis
       place(node, x, top, w, h); x += node.w;
-      node.depth = 0;
     }
     return x;
   }
@@ -90,10 +89,9 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
       if (used > bandH) { const k = (bandH - vgap * (col.length - 1)) / (used - vgap * (col.length - 1)); for (const sz of sizes) { sz.w *= k; sz.h *= k; } used = bandH; }
       const colW = Math.max(...sizes.map(s => s.w));
       let y = bandTop + rnd(col[col.length - 1].item).c * Math.max(0, bandH - used);
-      const depthK = r.d < 0.34 ? -1 : r.d < 0.67 ? 0 : 1;
       col.forEach((n, j) => {
         const s = sizes[j], dx = rnd(n.item).d * (colW - s.w);
-        place(n, Math.round(x + dx), y, s.w, s.h); n.depth = depthK;
+        place(n, Math.round(x + dx), y, s.w, s.h);
         y += s.h + vgap;
       });
       x += colW + vw * (phone ? 0.04 : 0.02) + rnd(col[0].item).a * vw * (phone ? 0.1 : 0.06);
@@ -222,7 +220,6 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
       else if (!node.loaded) { const d = Math.abs(lx + node.w / 2 - vw / 2); if (d < bgDist) { bgDist = d; bgNode = node; } }
       if (on) {
         if (!node.visible) { node.visible = true; node.el.classList.remove('off'); node.el.style.willChange = 'transform'; }
-        if (depth && node.depth) node.el.style.transform = `translate3d(${((sx + node.w / 2 - vw / 2) * node.depth * depth).toFixed(1)}px,0,0)`;
         if (node.item.type === 'motion') playVideo(node, (Math.min(vw, sx + node.w) - Math.max(0, sx)) / node.w);
       } else if (node.visible) { node.visible = false; node.el.classList.add('off'); node.el.style.willChange = ''; if (node.item.type === 'motion') playVideo(node, 0); }
     }
