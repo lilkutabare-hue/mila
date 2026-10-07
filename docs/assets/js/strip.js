@@ -1,6 +1,6 @@
 // Strip: photos packed into columns that fill the whole viewport, infinite horizontal scroll.
 // One transform per frame on the track; nodes keep static left/top and only hop by loopW when they wrap.
-import { pickTier, preloadImage, REDUCED } from './media.js?v=b9833fce';
+import { pickTier, preloadImage, REDUCED } from './media.js?v=2d0c215c';
 
 export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, drift = 0, depth = 0, maxTier = 'full', onOpen }) {
   let looping = loop;                      // a band loops too once it is wider than the screen
@@ -71,11 +71,11 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     let x = vw * 0.04, i = 0;
     while (i < list.length) {
       const lead = rnd(list[i].item);
-      const want = tall ? (lead.a < 0.3 ? 2 : lead.a < 0.75 ? 3 : 4) : (lead.a < 0.3 ? 1 : lead.a < 0.8 ? 2 : 3);
+      const want = tall ? (lead.a < 0.3 ? 2 : lead.a < 0.75 ? 3 : 4) : 1;   // wide screens: one frame per column, never two above each other
       // every column gets its own vertical band: a different top edge and a different height
       const r = lead;
       const free = vh - topSafe - bottomSafe;
-      const bandH = free * (0.55 + r.b * 0.45);          // 55–100% of the free height: columns differ in height and position
+      const bandH = free * (tall ? 0.55 + r.b * 0.45 : 0.36 + r.b * 0.54);   // wide: a single frame, 36–90% of the free height, placed anywhere in it
       const bandTop = topSafe + r.c * Math.max(0, free - bandH);
       const vgap = Math.round(vh * (0.015 + r.d * 0.03));
       const col = list.slice(i, i + Math.min(want, list.length - i));
