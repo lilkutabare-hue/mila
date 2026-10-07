@@ -225,15 +225,28 @@ async function cutoutSeal(src, size) {
   let x0 = W, y0 = H, x1 = 0, y1 = 0;
   for (let i = 0; i < W * H; i++) {
     const r = data[i * C], g = data[i * C + 1], b = data[i * C + 2];
-    const d = Math.hypot(r - paper[0], g - paper[1], b - paper[2]);
-    const a = Math.max(0, Math.min(255, Math.round((d - 40) / 40 * 255)));
+    // the wax is dark, the paper and the seal's own cast shadow are light: mask by luminance, not by colour distance
+    const L = 0.299 * r + 0.587 * g + 0.114 * b, Lp = 0.299 * paper[0] + 0.587 * paper[1] + 0.114 * paper[2];
+    const a = Math.max(0, Math.min(255, Math.round((Lp * 0.56 - L) / (Lp * 0.12) * 255)));
     alpha[i] = a;
     if (a > 200) { const x = i % W, y = (i / W) | 0; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
   }
-  const { data: soft, info: si } = await sharp(alpha, { raw: { width: W, height: H, channels: 1 } }).blur(1.2).raw().toBuffer({ resolveWithObject: true });
+  // close small holes left by glossy highlights inside the seal: wide blur → threshold, united with the raw mask
+  const { data: wide, info: wi } = await sharp(alpha, { raw: { width: W, height: H, channels: 1 } }).blur(9).raw().toBuffer({ resolveWithObject: true });
+  for (let i = 0; i < W * H; i++) if (wide[i * wi.channels] > 150) alpha[i] = 255;
+  const { data: soft, info: si } = await sharp(alpha, { raw: { width: W, height: H, channels: 1 } }).blur(1.4).raw().toBuffer({ resolveWithObject: true });
   const SC = si.channels;
+  // pull the edge in by a couple of pixels and paint semi-transparent pixels with the wax colour,
+  // so no paper shows as a light halo on dark browser tabs
+  let wr = 0, wg = 0, wb = 0, wn = 0;
+  for (let i = 0; i < W * H; i++) if (soft[i * SC] > 250) { wr += data[i * C]; wg += data[i * C + 1]; wb += data[i * C + 2]; wn++; }
+  const wax = wn ? [wr / wn, wg / wn, wb / wn] : [60, 30, 50];
   const rgba = Buffer.alloc(W * H * 4);
-  for (let i = 0; i < W * H; i++) { rgba[i * 4] = data[i * C]; rgba[i * 4 + 1] = data[i * C + 1]; rgba[i * 4 + 2] = data[i * C + 2]; rgba[i * 4 + 3] = soft[i * SC]; }
+  for (let i = 0; i < W * H; i++) {
+    const a0 = soft[i * SC], al = Math.max(0, Math.min(255, Math.round((a0 - 110) / 110 * 255)));
+    const k = al >= 250 ? 0 : 1 - al / 255 * 0.5;          // the more transparent, the more wax colour
+    rgba[i * 4] = data[i * C] * (1 - k) + wax[0] * k; rgba[i * 4 + 1] = data[i * C + 1] * (1 - k) + wax[1] * k; rgba[i * 4 + 2] = data[i * C + 2] * (1 - k) + wax[2] * k; rgba[i * 4 + 3] = al;
+  }
   // square crop around the seal with 6% air
   const side = Math.min(W, Math.round(Math.max(x1 - x0, y1 - y0) * 1.12));
   const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
@@ -244,7 +257,21 @@ async function cutoutSeal(src, size) {
 }
 async function buildBrandFromSeal(sealPath, site) {
   const { png: cut } = await cutoutSeal(sealPath, 1024);
-  await sharp(cut).resize(64, 64).png().toFile(join(PUB, 'favicon.png'));
+  // tighter crop for tiny sizes: the seal fills the square edge to edge
+  const tight = await sharp(cut).trim().toBuffer();
+  const sq = async (n) => sharp(tight).resize(n, n, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 }, kernel: 'lanczos3' }).sharpen({ sigma: n <= 48 ? 0.6 : 0.3 }).png().toBuffer();
+  await writeFile(join(PUB, 'favicon.png'), await sq(64));
+  // favicon.ico with PNG entries 16 / 32 / 48 (what Tilda's site settings ask for)
+  const sizes = [16, 32, 48], pngs = []; for (const n of sizes) pngs.push(await sq(n));
+  const head = Buffer.alloc(6 + 16 * sizes.length); head.writeUInt16LE(0, 0); head.writeUInt16LE(1, 2); head.writeUInt16LE(sizes.length, 4);
+  let off = head.length;
+  sizes.forEach((n, i) => { const e = 6 + 16 * i; head.writeUInt8(n, e); head.writeUInt8(n, e + 1); head.writeUInt8(0, e + 2); head.writeUInt8(0, e + 3); head.writeUInt16LE(1, e + 4); head.writeUInt16LE(32, e + 6); head.writeUInt32LE(pngs[i].length, e + 8); head.writeUInt32LE(off, e + 12); off += pngs[i].length; });
+  await writeFile(join(PUB, 'favicon.ico'), Buffer.concat([head, ...pngs]));
+  // files to upload by hand into Tilda: site settings → favicon / icons
+  const outDir = join(ROOT, 'tilda', 'icons'); await mkdir(outDir, { recursive: true });
+  await writeFile(join(outDir, 'favicon.ico'), Buffer.concat([head, ...pngs]));
+  for (const n of [152, 180, 270, 512]) await writeFile(join(outDir, `icon-${n}.png`), await sq(n));
+  for (const n of [152, 180]) await sharp({ create: { width: n, height: n, channels: 3, background: '#F2F0EB' } }).composite([{ input: await sq(Math.round(n * 0.84)), gravity: 'centre' }]).png().toFile(join(outDir, `icon-${n}-paper.png`));
   await sharp({ create: { width: 180, height: 180, channels: 3, background: '#F2F0EB' } })
     .composite([{ input: await sharp(cut).resize(150, 150).png().toBuffer(), left: 15, top: 15 }]).png().toFile(join(PUB, 'apple-touch-icon.png'));
   const W = 1200, H = 630, S = 470;
