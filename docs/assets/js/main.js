@@ -1,13 +1,13 @@
-import { createStrip } from './strip.js?v=79fcd37b';
-import { createWardrobe } from './wardrobe.js?v=79fcd37b';
-import { createViewer } from './viewer.js?v=79fcd37b';
-import { onRoute, navigate, back } from './router.js?v=79fcd37b';
-import { shuffle, esc } from './media.js?v=79fcd37b';
+import { createStrip } from './strip.js?v=b9833fce';
+import { createWardrobe } from './wardrobe.js?v=b9833fce';
+import { createViewer } from './viewer.js?v=b9833fce';
+import { onRoute, navigate, back } from './router.js?v=b9833fce';
+import { shuffle, esc } from './media.js?v=b9833fce';
 
 // When embedded elsewhere (Tilda T123), window.MH_BASE points at the hosted folder; everything loads from there.
 const BASE = (window.MH_BASE || new URL('../../', import.meta.url).href).replace(/\/?$/, '/');
 const abs = u => (u && !/^(https?:)?\/\//.test(u) ? BASE + u : u);
-import { MARKUP } from './markup.js?v=79fcd37b';
+import { MARKUP } from './markup.js?v=b9833fce';
 if (!document.getElementById('stage')) document.body.insertAdjacentHTML('beforeend', MARKUP);
 const manifest = await (await fetch(BASE + 'data/manifest.json', { cache: 'no-cache' })).json();
 const site = manifest.site || {};
@@ -144,4 +144,14 @@ const closeProject = () => { if (layerOpen === 'project') back(''); };
 $('#project-stage').addEventListener('tapout', closeProject);
 $('#project-stage').addEventListener('swipedown', closeProject);
 $('#p-title').addEventListener('click', e => { if (!currentProject?.link) { e.preventDefault(); closeProject(); } });
+// preloader leaves once what the visitor will see first is decoded: the first screen and the one next to it
+{
+  const t0 = performance.now(), MAX = 4500, MIN = 700;
+  const watched = () => { const cur = layerOpen === 'project' ? projectStrip : strip; const vw = innerWidth; return cur.debugNodes().filter(n => { const r = n.el.getBoundingClientRect(); return r.right > -vw * 0.3 && r.left < vw * 1.8; }); };
+  const iv = setInterval(() => {
+    const el = performance.now() - t0, ns = watched();
+    const ready = ns.length && ns.every(n => n.el.classList.contains('loaded') && (!n.media || n.media.tagName !== 'IMG' || n.media.complete));
+    if ((ready && el > MIN) || el > MAX || viewer.isOpen || layerOpen === 'wardrobe' || layerOpen === 'contact') { clearInterval(iv); window.MH_HIDE_LOADER?.(); }
+  }, 80);
+}
 window.__strip = strip; window.__pstrip = projectStrip;
