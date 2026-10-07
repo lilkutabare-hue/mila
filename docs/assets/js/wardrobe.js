@@ -1,64 +1,34 @@
 // Wardrobe: every work, by project, justified rows, lazy HQ loading.
-import { pickTier, esc, fmtTime } from './media.js?v=7db7e040';
+import { pickTier, esc } from './media.js?v=c1566379';
 
-export function createWardrobe({ el, manifest, projects, site, onOpen }) {
+export function createWardrobe({ el, projects, onOpen }) {
   const scroll = el.querySelector('.scroll');
-  const filtersEl = el.querySelector('#filters'), tocEl = el.querySelector('#toc'), sectionsEl = el.querySelector('#sections');
-  let filter = 'all', open = false, builtWidth = 0;
+  const sectionsEl = el.querySelector('#sections');
+  let open = false, builtWidth = 0;
   const tiles = new Map(); // item.id -> {el, item, w, h, tier, loaded}
-
-  // ---- filters
-  const cats = Object.keys(site.categories || {}).filter(c => manifest.projects.some(p => p.category === c));
-  for (const p of manifest.projects) if (!cats.includes(p.category)) cats.push(p.category);
-  const countOf = c => manifest.items.filter(i => c === 'all' || i.projectObj.category === c).length;
-  filtersEl.innerHTML = [['all', 'all'], ...cats.map(c => [c, site.categories?.[c] ?? c])]
-    .map(([k, label]) => `<button type="button" data-f="${esc(k)}" aria-pressed="${k === 'all'}">${esc(label)}<span class="k">${countOf(k)}</span></button>`).join('');
-  filtersEl.addEventListener('click', e => {
-    const b = e.target.closest('button[data-f]'); if (!b) return;
-    filter = b.dataset.f;
-    filtersEl.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
-    render(); scroll.scrollTo({ top: 0 });
-  });
 
   // ---- sections (built once, rows laid out per width)
   const sections = new Map();
   for (const p of projects) {
     const sec = document.createElement('section');
     sec.className = 'section'; sec.id = 'w-' + p.slug; sec.dataset.cat = p.category;
-    sec.innerHTML = `<h2 class="section-head"><span class="t">${esc(p.title)}</span>${p.year ? `<span class="yr">${esc(p.year)}</span>` : ''}<span class="cat">${esc(p.categoryLabel)}</span><span class="cnt">${p.count}</span>${p.credits ? `<span class="cr">${esc(p.credits)}</span>` : ''}</h2><div class="rows"></div>`;
+    sec.innerHTML = `<h2 class="section-head"><span class="t">${esc(p.title)}</span>${p.year ? `<span class="yr">${esc(p.year)}</span>` : ''}</h2><div class="rows"></div>`;
     sections.set(p.slug, sec);
     for (const item of p.itemObjs) {
       const t = document.createElement('button');
       t.type = 'button'; t.className = 'tile'; t.dataset.id = item.id;
       t.setAttribute('aria-label', `${p.title} — ${item.type === 'motion' ? 'video' : 'photo'}`);
-      if (item.type === 'motion') t.innerHTML = `<span class="m">motion · ${fmtTime(item.duration)}</span>`;
       t.addEventListener('click', () => onOpen(item));
       tiles.set(item.id, { el: t, item, w: 0, h: 0, tier: null, loaded: false });
     }
   }
-  sectionsEl.addEventListener('click', () => {});
-
-  function visibleProjects() { return projects.filter(p => filter === 'all' || p.category === filter); }
-  function render() {
-    const vis = visibleProjects();
-    tocEl.innerHTML = vis.map(p => `<a href="#w-${esc(p.slug)}" data-slug="${esc(p.slug)}">${esc(p.title)}</a>`).join('<span class="dot"> · </span>');
-    sectionsEl.replaceChildren(...vis.map(p => sections.get(p.slug)));
-    if (!vis.length) sectionsEl.innerHTML = '<p class="empty">nothing here</p>';
-    layout(true);
-  }
-  tocEl.addEventListener('click', e => {
-    const a = e.target.closest('a[data-slug]'); if (!a) return;
-    e.preventDefault(); e.stopPropagation();
-    sections.get(a.dataset.slug)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-  });
+  function render() { sectionsEl.replaceChildren(...projects.map(p => sections.get(p.slug))); layout(true); }
 
   function layout(force) {
     const W = sectionsEl.clientWidth; if (!W || (!force && W === builtWidth)) return;
     builtWidth = W;
-    const headH = el.querySelector('.head').offsetHeight;
-    for (const sec of sections.values()) sec.style.scrollMarginTop = (headH + 8) + 'px';
     const phone = innerWidth < 900, targetH = phone ? 180 : 320, gap = 8;
-    for (const p of visibleProjects()) {
+    for (const p of projects) {
       const rowsEl = sections.get(p.slug).querySelector('.rows');
       const rows = []; let row = [], sumAR = 0;
       for (const item of p.itemObjs) {
@@ -123,14 +93,12 @@ export function createWardrobe({ el, manifest, projects, site, onOpen }) {
     open(slug) {
       if (!open) { open = true; if (!sectionsEl.childElementCount) render(); else layout(false); }
       if (slug && sections.has(slug)) {
-        const p = projects.find(p => p.slug === slug);
-        if (p && filter !== 'all' && p.category !== filter) { filter = 'all'; filtersEl.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.f === 'all')); render(); }
         layout(false); sections.get(slug).scrollIntoView({ block: 'start' });
       }
       else layout(false);
     },
     close() { if (!open) return; open = false; for (const t of tiles.values()) t.el.querySelector('video')?.pause(); },
-    currentList() { return visibleProjects().flatMap(p => p.itemObjs); },
+    currentList() { return projects.flatMap(p => p.itemObjs); },
     relayout: () => layout(true),
   };
 }

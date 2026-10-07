@@ -20,7 +20,6 @@ img,video{display:block}
 /* ===== nav: two words at the bottom centre, as on the reference ===== */
 @media (max-width:899px){ .nav{bottom:calc(12px + var(--sai-b)) !important} body.wardrobe-open .nav{bottom:0 !important} }
 .nav{position:fixed;left:0;right:0;bottom:calc(22px + var(--sai-b));z-index:40;display:flex;justify-content:center;align-items:center;gap:34px;font-size:11px;line-height:16px;letter-spacing:.02em;color:#fff;mix-blend-mode:difference;pointer-events:none}
-.nav-gap{display:none}
 .nav a{pointer-events:auto;position:relative;padding:12px 8px;margin:-12px -8px}
 /* active link: a slow, quiet pulse of the whole word */
 .nav a.on{animation:pulse 3.6s ease-in-out infinite}
@@ -29,23 +28,6 @@ img,video{display:block}
 @media (prefers-reduced-motion:reduce){ .nav a.on{animation:none;text-decoration:underline;text-underline-offset:3px} }
 /* wardrobe scrolls under the nav: give the nav a paper floor there */
 body.wardrobe-open .nav{bottom:0;padding:30px 0 calc(22px + var(--sai-b));mix-blend-mode:normal;color:var(--ink);background:linear-gradient(to top,var(--paper) 62%,rgba(242,240,235,0))}
-
-/* ===== seal: micro logo top centre, develops out of the paper on arrival, then breathes ===== */
-.seal{display:none !important;position:fixed;bottom:calc(18px + var(--sai-b));left:50%;margin-left:-22px;z-index:45;width:44px;height:44px;transform-origin:50% 50%;
-  opacity:0;animation:develop 2.8s cubic-bezier(.25,.5,.2,1) .4s forwards, breathe 9s ease-in-out 3.4s infinite}
-.seal img{width:100%;height:100%;display:block;transition:opacity .35s}
-.seal-loop{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;opacity:0;transition:opacity .4s;
-  -webkit-mask-image:url(seal-mask.png);mask-image:url(seal-mask.png);-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;pointer-events:none}
-.seal-loop.on{opacity:1}
-.seal.restamp{animation:none}
-@keyframes develop{
-  0%{opacity:0;filter:contrast(.3) saturate(0) brightness(1.5);transform:scale(1)}
-  40%{opacity:.5;filter:contrast(.5) saturate(.2) brightness(1.3)}
-  100%{opacity:1;filter:contrast(1) saturate(1) brightness(1);transform:scale(1)}
-}
-@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
-@media (max-width:899px){ .seal{width:40px;height:40px;margin-left:-20px;bottom:calc(20px + var(--sai-b))} .nav-gap{width:84px} }
-@media (prefers-reduced-motion:reduce){ .seal{animation:none;opacity:1} }
 
 /* opaque paper under everything: hides whatever the host page (Tilda) renders above the body */
 .mh-bg{position:fixed;inset:0;z-index:0;background:var(--paper)}
@@ -80,16 +62,13 @@ body.project-open #stage,body.contact-open #stage{filter:blur(14px);opacity:.55}
   padding:calc(28px + var(--sai-t)) calc(var(--gutter) + var(--sai-r)) calc(96px + var(--sai-b)) calc(var(--gutter) + var(--sai-l))}
 
 /* wardrobe: titles and photos only */
-.wardrobe .head,.toc{display:none}
 .section{margin-bottom:34px}
 .section-head{display:flex;gap:12px;margin:0 0 8px;font-size:14px;line-height:1.4;font-weight:400}
-.section-head .cat,.section-head .cnt,.section-head .cr{display:none}
 .rows{display:flex;flex-direction:column;gap:4px}
 .row{display:flex;gap:4px}
 .tile{position:relative;background:var(--ghost);overflow:hidden;cursor:pointer;flex:none}
 .tile img,.tile video{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s}
 .tile.loaded img,.tile.loaded video{opacity:1}
-.tile .m{display:none}
 .empty{color:var(--muted);padding:20px 0}
 
 /* contact: translucent paper over the strip, centred text */

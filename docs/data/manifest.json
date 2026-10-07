@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-07T14:53:38.275Z",
+  "generated": "2026-10-07T15:19:39.186Z",
   "site": {
     "name": "mila harys",
     "role": "TODO: stylist · art direction · model",
@@ -22,19 +22,7 @@
     "railMode": "mix",
     "railPerProject": 8,
     "stripMin": 4,
-    "stripMax": 6,
-    "brand": {
-      "seal": "assets/seal.webp",
-      "mask": "assets/seal-mask.png",
-      "loops": [
-        "assets/loops/sheen-1.mp4?v=tmcy3am",
-        "assets/loops/sheen-1-rev.mp4?v=tmcy3am",
-        "assets/loops/sheen-2.mp4?v=tmcy3am",
-        "assets/loops/sheen-2-rev.mp4?v=tmcy3am",
-        "assets/loops/sheen-3.mp4?v=tmcy3am",
-        "assets/loops/sheen-3-rev.mp4?v=tmcy3am"
-      ]
-    }
+    "stripMax": 6
   },
   "projects": [
     {

@@ -209,7 +209,7 @@ async function buildBranding(firstFrames, site) {
   await sharp(mono(180)).png().toFile(join(PUB, 'apple-touch-icon.png'));
 }
 
-// ---------- brand from a seal image (content/brand/seal.*) ----------
+// ---------- favicon, touch icon and og image from content/brand/seal.* ----------
 async function findSeal() {
   for (const n of ['seal.png', 'seal.webp', 'seal.jpg', 'seal.jpeg']) { const p = join(CONTENT, 'brand', n); if (existsSync(p)) return p; }
   return null;
@@ -234,41 +234,16 @@ async function cutoutSeal(src, size) {
   const SC = si.channels;
   const rgba = Buffer.alloc(W * H * 4);
   for (let i = 0; i < W * H; i++) { rgba[i * 4] = data[i * C]; rgba[i * 4 + 1] = data[i * C + 1]; rgba[i * 4 + 2] = data[i * C + 2]; rgba[i * 4 + 3] = soft[i * SC]; }
-  // square crop around the seal with 6% air, same for the still, the mask and the video loops
+  // square crop around the seal with 6% air
   const side = Math.min(W, Math.round(Math.max(x1 - x0, y1 - y0) * 1.12));
   const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
   const left = Math.max(0, Math.min(W - side, Math.round(cx - side / 2))), top = Math.max(0, Math.min(H - side, Math.round(cy - side / 2)));
   const crop = { left, top, width: side, height: side };
   const png = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } }).extract(crop).png().toBuffer();
-  const maskRGBA = Buffer.alloc(W * H * 4);
-  for (let i = 0; i < W * H; i++) { maskRGBA[i * 4] = maskRGBA[i * 4 + 1] = maskRGBA[i * 4 + 2] = 0; maskRGBA[i * 4 + 3] = soft[i * SC]; }
-  const mask = await sharp(maskRGBA, { raw: { width: W, height: H, channels: 4 } }).extract(crop).png().toBuffer();
-  return { png, mask, rel: { x: left / W, y: top / H, s: side / W } };
+  return { png };
 }
 async function buildBrandFromSeal(sealPath, site) {
-  const { png: cut, mask, rel } = await cutoutSeal(sealPath, 1024);
-  await mkdir(join(PUB, 'assets', 'loops'), { recursive: true });
-  await sharp(cut).resize(512, 512).webp({ quality: 90, alphaQuality: 90 }).toFile(join(PUB, 'assets', 'seal.webp'));
-  await sharp(mask).resize(512, 512).png().toFile(join(PUB, 'assets', 'seal-mask.png'));
-  // optional idle loops: content/brand/loops/*.mp4 rendered from the same still → cropped to the same square
-  const loopsDir = join(CONTENT, 'brand', 'loops'); const loops = [];
-  if (existsSync(loopsDir)) {
-    const srcM = await mtime(sealPath);
-    for (const f of (await readdir(loopsDir)).filter(f => /\.(mp4|mov|m4v)$/i.test(f)).sort(natural)) {
-      const inM = await mtime(join(loopsDir, f));
-      // each source gives two loops: slowed to half speed, and the same played backwards (start = end, so both close)
-      for (const rev of [false, true]) {
-        const out = join(PUB, 'assets', 'loops', slugify(basename(f, extname(f))) + (rev ? '-rev' : '') + '.mp4');
-        if (!((await mtime(out)) > inM && (await mtime(out)) > srcM)) {
-          await run(FFMPEG, ['-y', '-hide_banner', '-loglevel', 'error', '-i', join(loopsDir, f),
-            '-vf', `crop=iw*${rel.s.toFixed(5)}:ih*${rel.s.toFixed(5)}:iw*${rel.x.toFixed(5)}:ih*${rel.y.toFixed(5)},scale=192:192:flags=lanczos,${rev ? 'reverse,' : ''}minterpolate=fps=36:mi_mode=mci:mc_mode=aobmc:me_mode=bidir,setpts=1.5*PTS,fps=24`,
-            '-an', '-c:v', 'libx264', '-crf', '26', '-preset', 'slow', '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-map_metadata', '-1', out]);
-        }
-        loops.push('assets/loops/' + basename(out) + '?v=' + Math.round(inM / 1000).toString(36) + 'm');
-      }
-    }
-  }
-  site.brand = { seal: 'assets/seal.webp', mask: 'assets/seal-mask.png', loops };
+  const { png: cut } = await cutoutSeal(sealPath, 1024);
   await sharp(cut).resize(64, 64).png().toFile(join(PUB, 'favicon.png'));
   await sharp({ create: { width: 180, height: 180, channels: 3, background: '#F2F0EB' } })
     .composite([{ input: await sharp(cut).resize(150, 150).png().toBuffer(), left: 15, top: 15 }]).png().toFile(join(PUB, 'apple-touch-icon.png'));

@@ -1,13 +1,13 @@
-import { createStrip } from './strip.js?v=7db7e040';
-import { createWardrobe } from './wardrobe.js?v=7db7e040';
-import { createViewer } from './viewer.js?v=7db7e040';
-import { onRoute, navigate, back } from './router.js?v=7db7e040';
-import { shuffle, esc, REDUCED } from './media.js?v=7db7e040';
+import { createStrip } from './strip.js?v=c1566379';
+import { createWardrobe } from './wardrobe.js?v=c1566379';
+import { createViewer } from './viewer.js?v=c1566379';
+import { onRoute, navigate, back } from './router.js?v=c1566379';
+import { shuffle, esc } from './media.js?v=c1566379';
 
 // When embedded elsewhere (Tilda T123), window.MH_BASE points at the hosted folder; everything loads from there.
 const BASE = (window.MH_BASE || new URL('../../', import.meta.url).href).replace(/\/?$/, '/');
 const abs = u => (u && !/^(https?:)?\/\//.test(u) ? BASE + u : u);
-import { MARKUP } from './markup.js?v=7db7e040';
+import { MARKUP } from './markup.js?v=c1566379';
 if (!document.getElementById('stage')) document.body.insertAdjacentHTML('beforeend', MARKUP);
 const manifest = await (await fetch(BASE + 'data/manifest.json', { cache: 'no-cache' })).json();
 const site = manifest.site || {};
@@ -15,8 +15,6 @@ for (const i of manifest.items) {
   i.rail.src = abs(i.rail.src); i.full.src = abs(i.full.src); if (i.small) i.small.src = abs(i.small.src);
   if (i.poster) { i.poster.rail = abs(i.poster.rail); i.poster.full = abs(i.poster.full); }
 }
-if (site.brand) { site.brand.seal = abs(site.brand.seal); site.brand.mask = abs(site.brand.mask); site.brand.loops = (site.brand.loops || []).map(abs); }
-{ const img = document.querySelector('#seal img'); if (img && site.brand?.seal) img.src = site.brand.seal; }
 const itemsById = new Map(manifest.items.map(i => [i.id, i]));
 const projectsBySlug = new Map();
 for (const p of manifest.projects) {
@@ -83,7 +81,7 @@ const contactEl = $('#contact');
 // ---- strips
 const strip = createStrip({ items: selected, stage: $('#stage'), loop: true, layout: 'scatter', drift: 6, depth: 0.05, maxTier: innerWidth >= 1100 ? 'full' : 'rail', onOpen: item => navigate(`p/${item.projectObj.slug}`) });
 const projectStrip = createStrip({ items: [], stage: $('#project-stage'), loop: false, loopIfWide: true, layout: 'band', swipeDown: true, onOpen: item => navigate(`look/${item.id}`) });
-const wardrobe = createWardrobe({ el: $('#wardrobe'), manifest, projects: visit, site, onOpen: item => navigate(`look/${item.id}`) });
+const wardrobe = createWardrobe({ el: $('#wardrobe'), projects: visit, onOpen: item => navigate(`look/${item.id}`) });
 const viewer = createViewer({
   el: $('#viewer'), railRectOf: () => null, setTaken: () => {}, centerRail: () => {}, isOnRail: () => false,
   onNavigate: item => navigate(`look/${item.id}`, { replace: true }),
@@ -146,21 +144,4 @@ const closeProject = () => { if (layerOpen === 'project') back(''); };
 $('#project-stage').addEventListener('tapout', closeProject);
 $('#project-stage').addEventListener('swipedown', closeProject);
 $('#p-title').addEventListener('click', e => { if (!currentProject?.link) { e.preventDefault(); closeProject(); } });
-// the seal: idle sheen loops play in random order with random pauses, each at a slightly different speed
-{
-  const loops = site.brand?.loops || [], video = $('#seal .seal-loop');
-  let lastIdx = -1, timer = 0;
-  const rnd = (a, b) => a + Math.random() * (b - a);
-  const next = () => {
-    if (!loops.length || document.hidden || REDUCED.matches || !video.offsetParent) return;
-    let i; do { i = Math.floor(Math.random() * loops.length); } while (loops.length > 1 && i === lastIdx);
-    lastIdx = i; video.src = loops[i]; video.playbackRate = rnd(0.9, 1.0);
-    video.play().then(() => video.classList.add('on')).catch(() => {});
-  };
-  const schedule = (ms) => { clearTimeout(timer); timer = setTimeout(next, ms); };
-  video.addEventListener('ended', () => { video.classList.remove('on'); schedule(rnd(2500, 7000)); });
-  video.addEventListener('error', () => { video.classList.remove('on'); schedule(8000); });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) { video.pause(); video.classList.remove('on'); clearTimeout(timer); } else schedule(1500); });
-  if (loops.length) schedule(2600);
-}
 window.__strip = strip; window.__pstrip = projectStrip;
