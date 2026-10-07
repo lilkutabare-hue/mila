@@ -1,5 +1,5 @@
 // Wardrobe: every work, by project, justified rows, lazy HQ loading.
-import { pickTier, esc, fmtTime } from './media.js?v=2bf590a7';
+import { pickTier, esc, fmtTime } from './media.js?v=7db7e040';
 
 export function createWardrobe({ el, manifest, projects, site, onOpen }) {
   const scroll = el.querySelector('.scroll');
@@ -25,7 +25,7 @@ export function createWardrobe({ el, manifest, projects, site, onOpen }) {
   for (const p of projects) {
     const sec = document.createElement('section');
     sec.className = 'section'; sec.id = 'w-' + p.slug; sec.dataset.cat = p.category;
-    sec.innerHTML = `<h2 class="section-head"><span class="t">${esc(p.title)}</span><span class="cat">${esc(p.categoryLabel)}</span><span class="cnt">${p.count}</span>${p.credits ? `<span class="cr">${esc(p.credits)}</span>` : ''}</h2><div class="rows"></div>`;
+    sec.innerHTML = `<h2 class="section-head"><span class="t">${esc(p.title)}</span>${p.year ? `<span class="yr">${esc(p.year)}</span>` : ''}<span class="cat">${esc(p.categoryLabel)}</span><span class="cnt">${p.count}</span>${p.credits ? `<span class="cr">${esc(p.credits)}</span>` : ''}</h2><div class="rows"></div>`;
     sections.set(p.slug, sec);
     for (const item of p.itemObjs) {
       const t = document.createElement('button');

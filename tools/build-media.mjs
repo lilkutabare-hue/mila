@@ -353,6 +353,7 @@ async function main() {
   for (const p of projects) {
     meta.projects[p.key] ??= { title: p.title, credits: '', link: '', order: null, railCount: null };
     meta.projects[p.key].link ??= '';
+    meta.projects[p.key].year ??= '';
     for (const it of p.items) meta.items[it.key] ??= { caption: '', hide: false, teaserStart: 0 };
   }
 
@@ -441,7 +442,7 @@ async function main() {
     const items = p.visible.map(it => it.id);
     items.forEach((id, i) => { byId.get(id).onRail = i < railCount; });
     manifest.projects.push({ slug: p.slug, title: p.displayTitle, category: p.category, categoryLabel: site.categories?.[p.category] ?? p.category,
-      credits: pm.credits || '', link: (pm.link || '').trim(), order: Number.isInteger(pm.order) ? pm.order : null, count: items.length, items });
+      credits: pm.credits || '', link: (pm.link || '').trim(), year: String(pm.year ?? '').trim(), order: Number.isInteger(pm.order) ? pm.order : null, count: items.length, items });
   }
   manifest.items = results;
   await writeJSON(join(CONTENT, 'meta.json'), meta);

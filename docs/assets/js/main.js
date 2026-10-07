@@ -1,13 +1,13 @@
-import { createStrip } from './strip.js?v=2bf590a7';
-import { createWardrobe } from './wardrobe.js?v=2bf590a7';
-import { createViewer } from './viewer.js?v=2bf590a7';
-import { onRoute, navigate, back } from './router.js?v=2bf590a7';
-import { shuffle, esc, REDUCED } from './media.js?v=2bf590a7';
+import { createStrip } from './strip.js?v=7db7e040';
+import { createWardrobe } from './wardrobe.js?v=7db7e040';
+import { createViewer } from './viewer.js?v=7db7e040';
+import { onRoute, navigate, back } from './router.js?v=7db7e040';
+import { shuffle, esc, REDUCED } from './media.js?v=7db7e040';
 
 // When embedded elsewhere (Tilda T123), window.MH_BASE points at the hosted folder; everything loads from there.
 const BASE = (window.MH_BASE || new URL('../../', import.meta.url).href).replace(/\/?$/, '/');
 const abs = u => (u && !/^(https?:)?\/\//.test(u) ? BASE + u : u);
-import { MARKUP } from './markup.js?v=2bf590a7';
+import { MARKUP } from './markup.js?v=7db7e040';
 if (!document.getElementById('stage')) document.body.insertAdjacentHTML('beforeend', MARKUP);
 const manifest = await (await fetch(BASE + 'data/manifest.json', { cache: 'no-cache' })).json();
 const site = manifest.site || {};
@@ -111,7 +111,7 @@ function showLayer(which) {
 }
 function openProject(p) {
   if (currentProject !== p) { currentProject = p; projectStrip.setItems(p.itemObjs); }
-  const t = $('#p-title'); t.textContent = p.title;
+  const t = $('#p-title'); t.textContent = p.title; if (p.year) { const y = document.createElement('span'); y.className = 'yr'; y.textContent = p.year; t.appendChild(y); }
   if (p.link) { t.href = p.link; t.target = '_blank'; t.rel = 'noopener'; t.classList.add('linked'); }
   else { t.removeAttribute('href'); t.removeAttribute('target'); t.classList.remove('linked'); }
   showLayer('project'); wardrobe.close(); strip.pause();
