@@ -21,13 +21,17 @@ img,video{display:block}
 @media (max-width:899px){ .nav{bottom:calc(12px + var(--sai-b)) !important} body.wardrobe-open .nav{bottom:0 !important} }
 .nav{position:fixed;left:0;right:0;bottom:calc(22px + var(--sai-b));z-index:40;display:flex;justify-content:center;align-items:center;gap:34px;font-size:11px;line-height:16px;letter-spacing:.02em;color:#fff;mix-blend-mode:difference;pointer-events:none}
 .nav a{pointer-events:auto;position:relative;padding:12px 8px;margin:-12px -8px}
-/* active link: a slow, quiet pulse of the whole word */
-.nav a.on{animation:pulse 3.6s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* active link: it lands from a soft blur, then a band of light keeps sweeping through the word, as on a lock screen.
+   Over the strip the nav draws in difference, so the band is a darker grey that reads as light; over paper it is a light one */
+.nav{--glint:#474747}
+.nav a.on{background:linear-gradient(100deg,currentColor 0 37%,var(--glint) 50%,currentColor 63% 100%) 100% 0/300% 100% no-repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:land .6s cubic-bezier(.2,.7,.1,1),glint 2.8s cubic-bezier(.45,0,.2,1) .35s infinite}
+@keyframes land{from{filter:blur(5px);opacity:.25}to{filter:blur(0);opacity:1}}
+@keyframes glint{0%{background-position:100% 0}50%,100%{background-position:0 0}}
 @media (hover:hover){ .nav a:hover{opacity:.6} }
 @media (prefers-reduced-motion:reduce){ .nav a.on{animation:none;text-decoration:underline;text-underline-offset:3px} }
 /* wardrobe scrolls under the nav: give the nav a paper floor there */
-body.wardrobe-open .nav{bottom:0;padding:30px 0 calc(22px + var(--sai-b));mix-blend-mode:normal;color:var(--ink);background:linear-gradient(to top,var(--paper) 62%,rgba(242,240,235,0))}
+body.wardrobe-open .nav{--glint:#d3cfc7;bottom:0;padding:30px 0 calc(22px + var(--sai-b));mix-blend-mode:normal;color:var(--ink);background:linear-gradient(to top,var(--paper) 62%,rgba(242,240,235,0))}
 
 /* ===== roles: model / styling, two words at the top centre, mirroring the nav below ===== */
 .roles{position:fixed;left:0;right:0;top:calc(22px + var(--sai-t));z-index:40;display:flex;justify-content:center;align-items:center;gap:34px;font-size:11px;line-height:16px;letter-spacing:.02em;color:#fff;mix-blend-mode:difference;pointer-events:none;transition:opacity .2s}
@@ -96,11 +100,11 @@ body.project-open #stage,body.contact-open #stage{filter:blur(14px);opacity:.55}
 .contact.open{opacity:1}
 .contact .info{padding:0 24px calc(60px + var(--sai-b))}
 .contact{-webkit-font-smoothing:auto;color:#000}
-.contact h1{font:24px/1.15 var(--sans);text-transform:none;margin:0 0 6px;letter-spacing:-.01em}
-.contact p{margin:0;font-size:13px;line-height:1.5}
+.contact h1{font:18px/1.15 var(--sans);text-transform:none;margin:0 0 5px;letter-spacing:-.01em}
+.contact p{margin:0;font-size:12px;line-height:1.5}
 .contact .role{display:none}
 .contact a{text-transform:none;padding:8px 6px;margin:-6px -6px;display:inline-block}
-@media (max-width:899px){ .contact h1{font-size:21px} .contact p{font-size:12px} }
+@media (max-width:899px){ .contact h1{font-size:16px} .contact p{font-size:11px} }
 .contact a:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* ===== viewer (single work, from wardrobe or a shoot) ===== */

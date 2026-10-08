@@ -1,6 +1,6 @@
 // Strip: photos packed into columns that fill the whole viewport, infinite horizontal scroll.
 // One transform per frame on the track; nodes keep static left/top and only hop by loopW when they wrap.
-import { pickTier, preloadImage, REDUCED } from './media.js?v=a1b9ccd2';
+import { pickTier, preloadImage, REDUCED } from './media.js?v=a3a8638c';
 
 export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, maxTier = 'full', onOpen }) {
   let looping = loop;                      // a band loops too once it is wider than the screen

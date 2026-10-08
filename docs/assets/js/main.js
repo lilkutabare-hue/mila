@@ -1,13 +1,13 @@
-import { createStrip } from './strip.js?v=a1b9ccd2';
-import { createWardrobe } from './wardrobe.js?v=a1b9ccd2';
-import { createViewer } from './viewer.js?v=a1b9ccd2';
-import { onRoute, navigate, back, parse } from './router.js?v=a1b9ccd2';
-import { shuffle, esc } from './media.js?v=a1b9ccd2';
+import { createStrip } from './strip.js?v=a3a8638c';
+import { createWardrobe } from './wardrobe.js?v=a3a8638c';
+import { createViewer } from './viewer.js?v=a3a8638c';
+import { onRoute, navigate, back, parse } from './router.js?v=a3a8638c';
+import { shuffle, esc } from './media.js?v=a3a8638c';
 
 // When embedded elsewhere (Tilda T123), window.MH_BASE points at the hosted folder; everything loads from there.
 const BASE = (window.MH_BASE || new URL('../../', import.meta.url).href).replace(/\/?$/, '/');
 const abs = u => (u && !/^(https?:)?\/\//.test(u) ? BASE + u : u);
-import { MARKUP } from './markup.js?v=a1b9ccd2';
+import { MARKUP } from './markup.js?v=a3a8638c';
 if (!document.getElementById('stage')) document.body.insertAdjacentHTML('beforeend', MARKUP);
 const manifest = await (await fetch(BASE + 'data/manifest.json', { cache: 'no-cache' })).json();
 const site = manifest.site || {};

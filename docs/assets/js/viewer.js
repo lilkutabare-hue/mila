@@ -1,5 +1,5 @@
 // Full-screen viewer: a look taken off the hanger.
-import { pickTier, preloadImage, fmtTime, pad3, esc, REDUCED } from './media.js?v=a1b9ccd2';
+import { pickTier, preloadImage, fmtTime, pad3, esc, REDUCED } from './media.js?v=a3a8638c';
 
 const EASE = 'cubic-bezier(.2,.7,.1,1)';
 
