@@ -372,7 +372,7 @@ async function main() {
     const title = (pm.title || p.title).trim() || p.title;
     let slug = slugify(title); if (usedSlugs.has(slug)) { slug += '-' + (usedSlugs.get(slug) + 1); } usedSlugs.set(slugify(title), (usedSlugs.get(slugify(title)) || 1) + 1);
     p.slug = slug; p.displayTitle = title;
-    p.visible = p.items.filter(it => !meta.items[it.key]?.hide);
+    p.visible = pm.hide ? [] : p.items.filter(it => !meta.items[it.key]?.hide);   // a hidden shoot takes all its works with it
     for (const it of p.visible) it.id = `${slug}-${it.hash.slice(0, 6)}`;
   }
 
@@ -447,6 +447,7 @@ async function main() {
   const byId = new Map(results.map(e => [e.id, e]));
   for (const p of projects) {
     const pm = meta.projects[p.key];
+    if (!p.visible.length) continue;
     const railCount = Number.isInteger(pm.railCount) ? pm.railCount : (site.railPerProject ?? 6);
     const items = p.visible.map(it => it.id);
     items.forEach((id, i) => { byId.get(id).onRail = i < railCount; });

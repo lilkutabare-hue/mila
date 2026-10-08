@@ -14,7 +14,8 @@
       "order": null,
       "railCount": null,
       "link": "",
-      "year": ""
+      "year": "",
+      "hide": true
     },
     "modeling/For Angeldust": {
       "title": "For Angeldust",
@@ -38,7 +39,8 @@
       "order": null,
       "railCount": null,
       "link": "",
-      "year": "2025"
+      "year": "2025",
+      "hide": true
     },
     "modeling/For Sorocolita": {
       "title": "For Sorocolita",
