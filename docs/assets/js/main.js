@@ -1,13 +1,13 @@
-import { createStrip } from './strip.js?v=2a63b5cc';
-import { createWardrobe } from './wardrobe.js?v=2a63b5cc';
-import { createViewer } from './viewer.js?v=2a63b5cc';
-import { onRoute, navigate, back, parse } from './router.js?v=2a63b5cc';
-import { shuffle, esc } from './media.js?v=2a63b5cc';
+import { createStrip } from './strip.js?v=7c89caeb';
+import { createWardrobe } from './wardrobe.js?v=7c89caeb';
+import { createViewer } from './viewer.js?v=7c89caeb';
+import { onRoute, navigate, back, parse } from './router.js?v=7c89caeb';
+import { shuffle, esc } from './media.js?v=7c89caeb';
 
 // When embedded elsewhere (Tilda T123), window.MH_BASE points at the hosted folder; everything loads from there.
 const BASE = (window.MH_BASE || new URL('../../', import.meta.url).href).replace(/\/?$/, '/');
 const abs = u => (u && !/^(https?:)?\/\//.test(u) ? BASE + u : u);
-import { MARKUP } from './markup.js?v=2a63b5cc';
+import { MARKUP } from './markup.js?v=7c89caeb';
 if (!document.getElementById('stage')) document.body.insertAdjacentHTML('beforeend', MARKUP);
 const manifest = await (await fetch(BASE + 'data/manifest.json', { cache: 'no-cache' })).json();
 const site = manifest.site || {};
@@ -92,8 +92,7 @@ const contactEl = $('#contact');
 }
 
 // ---- strips
-const stageEl = $('#stage');
-const strip = createStrip({ items: selectionFor(picked), stage: stageEl, loop: true, layout: 'scatter', maxTier: innerWidth >= 1100 ? 'full' : 'rail', onOpen: item => navigate(`p/${item.projectObj.slug}`) });
+const strip = createStrip({ items: selectionFor(picked), stage: $('#stage'), loop: true, layout: 'scatter', maxTier: innerWidth >= 1100 ? 'full' : 'rail', onOpen: item => navigate(`p/${item.projectObj.slug}`) });
 const projectStrip = createStrip({ items: [], stage: $('#project-stage'), loop: false, loopIfWide: true, layout: 'band', swipeDown: true, onOpen: item => navigate(`look/${item.id}`) });
 const wardrobe = createWardrobe({ el: $('#wardrobe'), projects: visit, role: picked, onOpen: item => navigate(`look/${item.id}`) });
 const viewer = createViewer({
@@ -108,13 +107,10 @@ function paintRoles() {
   rolesEl.classList.toggle('picked', !!picked);
   for (const [r, a] of navRoles) { a.classList.toggle('on', r === picked); if (r === picked) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }
 }
-let swapT = 0;
 function setRole(r) {
   if (r === picked) return;
   picked = r; paintRoles(); paintNav(); wardrobe.setRole(r);
-  // the strip fades out, is refilled from the start, and fades back in as its frames decode
-  clearTimeout(swapT); stageEl.classList.add('swap');
-  swapT = setTimeout(() => { strip.setItems(selectionFor(r)); stageEl.classList.remove('swap'); }, 200);
+  strip.swap(selectionFor(r));   // frames riffle out and the new set lands; refilled from the start
 }
 for (const [r, a] of navRoles) {
   a.textContent = site.labels?.[r] || r;

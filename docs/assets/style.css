@@ -46,8 +46,8 @@ body.wardrobe-open .roles{top:0;padding:calc(22px + var(--sai-t)) 0 30px;mix-ble
 @media (max-width:899px){ body.wardrobe-open .roles{padding-top:calc(14px + var(--sai-t))} }
 .layer.wardrobe .scroll{padding-top:calc(76px + var(--sai-t))}
 @media (max-width:899px){ .layer.wardrobe .scroll{padding-top:calc(60px + var(--sai-t))} }
-/* switching roles: the strip fades out, refills, and fades back in */
-#stage.swap{opacity:0 !important;transition:opacity .2s}
+/* switching roles: the new frames wait unseen until the first screen has decoded, then land */
+.stage.arriving .pic{opacity:0}
 
 /* opaque paper under everything: hides whatever the host page (Tilda) renders above the body */
 .mh-bg{position:fixed;inset:0;z-index:0;background:var(--paper)}

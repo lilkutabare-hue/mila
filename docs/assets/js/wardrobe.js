@@ -1,10 +1,12 @@
 // Wardrobe: every work, by project, justified rows, lazy HQ loading. With a role picked, only that side of the work.
-import { pickTier, esc } from './media.js?v=2a63b5cc';
+import { pickTier, esc, REDUCED } from './media.js?v=7c89caeb';
 
 export function createWardrobe({ el, projects, role = null, onOpen }) {
   const scroll = el.querySelector('.scroll');
   const sectionsEl = el.querySelector('#sections');
-  let open = false, builtWidth = 0, dirty = false;
+  let open = false, builtWidth = 0, dirty = false, swapId = 0;
+  const W_OUT = [{ opacity: 0, filter: 'blur(8px)', transform: 'translateY(-12px)' }];
+  const W_IN = [{ opacity: 0, filter: 'blur(10px)', transform: 'translateY(-12px)' }, { opacity: 1, filter: 'blur(0px)', transform: 'none' }];
   const itemsOf = p => role ? p.itemObjs.filter(i => i.role === role) : p.itemObjs;
   const shown = () => projects.filter(p => itemsOf(p).length);
   const tiles = new Map(); // item.id -> {el, item, w, h, tier, loaded}
@@ -103,7 +105,18 @@ export function createWardrobe({ el, projects, role = null, onOpen }) {
     currentList() { return shown().flatMap(itemsOf); },
     setRole(r) {
       if (r === role) return; role = r;
-      if (open) { render(); scroll.scrollTop = 0; } else dirty = true;   // hidden: widths read 0, lay out on the next open
+      if (!open) { dirty = true; return; }   // hidden: widths read 0, lay out on the next open
+      // the shoots on screen lift away blurred, one after another; the new ones settle in from the same height
+      const id = ++swapId;
+      const seen = () => [...sectionsEl.children].filter(sec => { const b = sec.getBoundingClientRect(); return b.bottom > 0 && b.top < innerHeight; });
+      const refill = () => { render(); scroll.scrollTop = 0; };
+      if (REDUCED.matches) { refill(); return; }
+      Promise.all(seen().map((sec, i) => sec.animate(W_OUT, { duration: 260, delay: i * 50, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' }).finished.catch(() => {}))).then(() => {
+        if (id !== swapId) return;
+        for (const sec of sections.values()) sec.getAnimations().forEach(a => a.cancel());
+        refill();
+        seen().forEach((sec, i) => sec.animate(W_IN, { duration: 560, delay: i * 70, easing: 'cubic-bezier(.2,.7,.1,1)', fill: 'backwards' }));
+      });
     },
     relayout: () => layout(true),
   };

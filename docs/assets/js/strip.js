@@ -1,6 +1,6 @@
 // Strip: photos packed into columns that fill the whole viewport, infinite horizontal scroll.
 // One transform per frame on the track; nodes keep static left/top and only hop by loopW when they wrap.
-import { pickTier, preloadImage, REDUCED } from './media.js?v=2a63b5cc';
+import { pickTier, preloadImage, REDUCED } from './media.js?v=7c89caeb';
 
 export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, maxTier = 'full', onOpen }) {
   let looping = loop;                      // a band loops too once it is wider than the screen
@@ -293,6 +293,38 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   function run() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
   function stop() { cancelAnimationFrame(raf); raf = 0; }
 
+  function setItems(list) { live = list.slice(); for (const n of nodes) n.el.remove(); for (const [, n] of base) n.el.remove(); track.replaceChildren(); base = new Map(); nodes = []; if (active) build(null); }
+
+  // ---------- swap: a new set of frames ----------
+  // the frames on screen lift and turn away like riffled cards, blurring out one after another;
+  // the new set lands the same way, once its first screen has decoded
+  const LIFT = 'perspective(1200px) translateY(-2vh) scale(1.03)';
+  const OUT = [{ transform: LIFT + ' rotateY(-14deg)', filter: 'blur(10px)', opacity: 0 }];
+  const IN = [{ transform: LIFT + ' rotateY(14deg)', filter: 'blur(12px)', opacity: 0 }, { transform: 'perspective(1200px) translateY(0) scale(1) rotateY(0deg)', filter: 'blur(0px)', opacity: 1 }];
+  let swapId = 0;
+  const onScreen = () => nodes.filter(n => n.visible).sort((a, b) => a.el.getBoundingClientRect().left - b.el.getBoundingClientRect().left);
+  async function swap(list) {
+    const id = ++swapId;
+    if (!active || REDUCED.matches) { setItems(list); return; }
+    // the first screen of the new set starts loading while the old one leaves (tier guessed from the usual frame height)
+    const tall = vw < 700 ? 0.25 : 0.6, guess = vh * tall * (devicePixelRatio || 1) <= 600 ? 'small' : 'rail';
+    for (const i of list.slice(0, 6)) if (i.type === 'photo' && i[guess]) preloadImage(i[guess].src).catch(() => {});
+    const out = onScreen(), step = Math.min(40, 150 / Math.max(1, out.length));
+    await Promise.all(out.map((n, i) => n.el.animate(OUT, { duration: 300, delay: i * step, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' }).finished.catch(() => {})));
+    if (id !== swapId) return;
+    stage.classList.add('arriving'); setItems(list);
+    const t0 = performance.now();
+    await new Promise(res => {
+      const ready = () => { const v = onScreen(); return v.length && v.every(n => n.el.classList.contains('loaded') && (!n.media || n.media.tagName !== 'IMG' || n.media.complete)); };
+      const check = () => (id !== swapId || ready() || performance.now() - t0 > 450) ? res() : requestAnimationFrame(check);
+      requestAnimationFrame(check);
+    });
+    if (id !== swapId) return;
+    const inn = onScreen(), step2 = Math.min(55, 240 / Math.max(1, inn.length));
+    inn.forEach((n, i) => n.el.animate(IN, { duration: 600, delay: i * step2, easing: 'cubic-bezier(.2,.7,.1,1)', fill: 'backwards' }));
+    stage.classList.remove('arriving');
+  }
+
   return {
     start() { if (active) return; build(null); active = true; run(); },
     pause() { active = false; stop(); for (const n of nodes) playVideo(n, 0); },
@@ -302,7 +334,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
       if (!nodes.length) build(null); else if (w !== vw || h !== vh) build(nodes.find(n => n.visible)?.item || null);
       run();
     },
-    setItems(list) { live = list.slice(); for (const n of nodes) n.el.remove(); for (const [, n] of base) n.el.remove(); track.replaceChildren(); base = new Map(); nodes = []; if (active) build(null); },
+    setItems, swap,
     get active() { return active; },
     nudge(d) { target += d; },
     stats: () => ({ pos, target, loopW, pad, nodes: nodes.length, vw, vh, inVel }),
