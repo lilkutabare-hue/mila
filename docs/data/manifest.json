@@ -12,12 +12,19 @@
     "telegram": "TODO",
     "labels": {
       "gallery": "wardrobe",
-      "contact": "contact"
+      "contact": "contact",
+      "model": "model",
+      "styling": "styling"
     },
     "categories": {
       "styling": "styling",
       "modeling": "modeling",
       "artdir + styling": "art direction + styling"
+    },
+    "roles": {
+      "modeling": "model",
+      "styling": "styling",
+      "artdir + styling": "styling"
     },
     "railMode": "mix",
     "railPerProject": 8,
@@ -501,6 +508,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6463,
       "h": 4464,
       "rail": {
@@ -525,6 +533,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6984,
       "h": 4660,
       "rail": {
@@ -549,6 +558,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6984,
       "h": 4660,
       "rail": {
@@ -573,6 +583,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6984,
       "h": 4660,
       "rail": {
@@ -597,6 +608,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6984,
       "h": 4660,
       "rail": {
@@ -621,6 +633,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6984,
       "h": 4660,
       "rail": {
@@ -645,6 +658,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6984,
       "h": 4660,
       "rail": {
@@ -669,6 +683,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6984,
       "h": 4660,
       "rail": {
@@ -693,6 +708,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 6984,
       "h": 4660,
       "rail": {
@@ -717,6 +733,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 6984,
       "h": 4660,
       "rail": {
@@ -741,6 +758,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 6984,
       "h": 4660,
       "rail": {
@@ -765,6 +783,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3885,
       "h": 5181,
       "rail": {
@@ -789,6 +808,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 5884,
       "h": 3923,
       "rail": {
@@ -813,6 +833,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3523,
       "h": 4698,
       "rail": {
@@ -837,6 +858,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -861,6 +883,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -885,6 +908,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 2560,
       "h": 1707,
       "rail": {
@@ -909,6 +933,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 2560,
       "h": 1707,
       "rail": {
@@ -933,6 +958,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 2560,
       "h": 1707,
       "rail": {
@@ -957,6 +983,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 1707,
       "h": 2560,
       "rail": {
@@ -981,6 +1008,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 1707,
       "h": 2560,
       "rail": {
@@ -1005,6 +1033,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -1029,6 +1058,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -1053,6 +1083,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -1077,6 +1108,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -1101,6 +1133,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -1125,6 +1158,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3885,
       "h": 5181,
       "rail": {
@@ -1149,6 +1183,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -1173,6 +1208,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3885,
       "h": 5181,
       "rail": {
@@ -1197,6 +1233,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "model",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -1221,6 +1258,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "model",
       "w": 3885,
       "h": 5181,
       "rail": {
@@ -1245,6 +1283,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 1707,
       "h": 2560,
       "rail": {
@@ -1269,6 +1308,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 1707,
       "h": 2560,
       "rail": {
@@ -1293,6 +1333,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 1707,
       "h": 2560,
       "rail": {
@@ -1317,6 +1358,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 1707,
       "h": 2560,
       "rail": {
@@ -1341,6 +1383,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 1707,
       "h": 2560,
       "rail": {
@@ -1365,6 +1408,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 1707,
       "h": 2560,
       "rail": {
@@ -1389,6 +1433,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 1707,
       "h": 2560,
       "rail": {
@@ -1413,6 +1458,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 2160,
       "h": 2700,
       "rail": {
@@ -1437,6 +1483,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 6016,
       "h": 4016,
       "rail": {
@@ -1461,6 +1508,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 4178,
       "h": 5222,
       "rail": {
@@ -1485,6 +1533,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 6544,
       "h": 4368,
       "rail": {
@@ -1509,6 +1558,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 6016,
       "h": 4016,
       "rail": {
@@ -1533,6 +1583,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 4160,
       "h": 5564,
       "rail": {
@@ -1557,6 +1608,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 4160,
       "h": 5720,
       "rail": {
@@ -1581,6 +1633,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 4160,
       "h": 5325,
       "rail": {
@@ -1605,6 +1658,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3439,
       "h": 4800,
       "rail": {
@@ -1629,6 +1683,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3998,
       "h": 5700,
       "rail": {
@@ -1653,6 +1708,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3952,
       "h": 5135,
       "rail": {
@@ -1677,6 +1733,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 2336,
       "h": 2920,
       "rail": {
@@ -1701,6 +1758,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 4017,
       "h": 5623,
       "rail": {
@@ -1725,6 +1783,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 2048,
       "h": 2560,
       "rail": {
@@ -1749,6 +1808,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 2048,
       "h": 2560,
       "rail": {
@@ -1773,6 +1833,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 2048,
       "h": 2560,
       "rail": {
@@ -1797,6 +1858,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 2048,
       "h": 2560,
       "rail": {
@@ -1821,6 +1883,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 2560,
       "h": 1707,
       "rail": {
@@ -1845,6 +1908,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 2560,
       "h": 1707,
       "rail": {
@@ -1869,6 +1933,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "model",
       "w": 2048,
       "h": 2560,
       "rail": {
@@ -1893,6 +1958,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "model",
       "w": 2048,
       "h": 2560,
       "rail": {
@@ -1917,6 +1983,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "model",
       "w": 2560,
       "h": 2048,
       "rail": {
@@ -1941,6 +2008,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3024,
       "h": 4032,
       "rail": {
@@ -1965,6 +2033,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 4284,
       "h": 5712,
       "rail": {
@@ -1989,6 +2058,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 2316,
       "h": 3088,
       "rail": {
@@ -2013,6 +2083,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3024,
       "h": 4032,
       "rail": {
@@ -2037,6 +2108,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3024,
       "h": 4032,
       "rail": {
@@ -2061,6 +2133,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3024,
       "h": 4032,
       "rail": {
@@ -2085,6 +2158,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3024,
       "h": 4032,
       "rail": {
@@ -2109,6 +2183,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "model",
       "w": 3024,
       "h": 4032,
       "rail": {
@@ -2133,6 +2208,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "model",
       "w": 3024,
       "h": 4032,
       "rail": {
@@ -2157,6 +2233,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "model",
       "w": 3024,
       "h": 4032,
       "rail": {
@@ -2181,6 +2258,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 2880,
       "h": 3840,
       "rail": {
@@ -2205,6 +2283,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 4284,
       "h": 5712,
       "rail": {
@@ -2229,6 +2308,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 2880,
       "h": 3840,
       "rail": {
@@ -2253,6 +2333,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 2880,
       "h": 3840,
       "rail": {
@@ -2277,6 +2358,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 2880,
       "h": 3840,
       "rail": {
@@ -2301,6 +2383,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 2880,
       "h": 3840,
       "rail": {
@@ -2325,6 +2408,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3892,
       "h": 5190,
       "rail": {
@@ -2349,6 +2433,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3892,
       "h": 5190,
       "rail": {
@@ -2373,6 +2458,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3892,
       "h": 5190,
       "rail": {
@@ -2397,6 +2483,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3892,
       "h": 5190,
       "rail": {
@@ -2421,6 +2508,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3892,
       "h": 5190,
       "rail": {
@@ -2445,6 +2533,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3892,
       "h": 5190,
       "rail": {
@@ -2469,6 +2558,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3892,
       "h": 5190,
       "rail": {
@@ -2493,6 +2583,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 1920,
       "rail": {
@@ -2517,6 +2608,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 1920,
       "rail": {
@@ -2541,6 +2633,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 1920,
       "rail": {
@@ -2565,6 +2658,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 1920,
       "rail": {
@@ -2589,6 +2683,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 1910,
       "rail": {
@@ -2613,6 +2708,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 1920,
       "rail": {
@@ -2637,6 +2733,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 4093,
       "h": 5116,
       "rail": {
@@ -2661,6 +2758,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3352,
       "h": 4190,
       "rail": {
@@ -2685,6 +2783,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3883,
       "h": 4854,
       "rail": {
@@ -2709,6 +2808,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3892,
       "h": 4865,
       "rail": {
@@ -2733,6 +2833,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3684,
       "h": 4605,
       "rail": {
@@ -2757,6 +2858,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3888,
       "h": 4860,
       "rail": {
@@ -2781,6 +2883,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3604,
       "h": 4505,
       "rail": {
@@ -2805,6 +2908,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 2902,
       "h": 3627,
       "rail": {
@@ -2829,6 +2933,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3384,
       "h": 2538,
       "rail": {
@@ -2853,6 +2958,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3384,
       "h": 2538,
       "rail": {
@@ -2877,6 +2983,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3384,
       "h": 4513,
       "rail": {
@@ -2901,6 +3008,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3384,
       "h": 4513,
       "rail": {
@@ -2925,6 +3033,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3384,
       "h": 2538,
       "rail": {
@@ -2949,6 +3058,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3384,
       "h": 4513,
       "rail": {
@@ -2973,6 +3083,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3384,
       "h": 2538,
       "rail": {
@@ -2997,6 +3108,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3384,
       "h": 2538,
       "rail": {
@@ -3021,6 +3133,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3384,
       "h": 2538,
       "rail": {
@@ -3045,6 +3158,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3384,
       "h": 2538,
       "rail": {
@@ -3069,6 +3183,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3384,
       "h": 2538,
       "rail": {
@@ -3093,6 +3208,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3384,
       "h": 4513,
       "rail": {
@@ -3117,6 +3233,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 1800,
       "rail": {
@@ -3141,6 +3258,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 960,
       "rail": {
@@ -3165,6 +3283,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 1800,
       "rail": {
@@ -3189,6 +3308,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 960,
       "rail": {
@@ -3213,6 +3333,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 1800,
       "rail": {
@@ -3237,6 +3358,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 1800,
       "rail": {
@@ -3261,6 +3383,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 1800,
       "rail": {
@@ -3285,6 +3408,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1440,
       "h": 1799,
       "rail": {
@@ -3309,6 +3433,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1920,
       "h": 1080,
       "rail": {
@@ -3333,6 +3458,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1920,
       "h": 1080,
       "rail": {
@@ -3357,6 +3483,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6000,
       "h": 3376,
       "rail": {
@@ -3381,6 +3508,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 2485,
       "h": 3314,
       "rail": {
@@ -3405,6 +3533,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 5777,
       "h": 3250,
       "rail": {
@@ -3429,6 +3558,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 5672,
       "h": 3191,
       "rail": {
@@ -3453,6 +3583,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6000,
       "h": 3376,
       "rail": {
@@ -3477,6 +3608,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 5591,
       "h": 3145,
       "rail": {
@@ -3501,6 +3633,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -3525,6 +3658,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -3549,6 +3683,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -3573,6 +3708,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 5446,
       "h": 3631,
       "rail": {
@@ -3597,6 +3733,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -3621,6 +3758,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 5824,
       "h": 3883,
       "rail": {
@@ -3645,6 +3783,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3885,
       "h": 5181,
       "rail": {
@@ -3669,6 +3808,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6000,
       "h": 4000,
       "rail": {
@@ -3693,6 +3833,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 4720,
       "h": 6109,
       "rail": {
@@ -3717,6 +3858,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 4930,
       "h": 6163,
       "rail": {
@@ -3741,6 +3883,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3468,
       "h": 4335,
       "rail": {
@@ -3765,6 +3908,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 4554,
       "h": 5691,
       "rail": {
@@ -3789,6 +3933,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 4738,
       "h": 5923,
       "rail": {
@@ -3813,6 +3958,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 5232,
       "h": 6540,
       "rail": {
@@ -3837,6 +3983,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 4941,
       "h": 6177,
       "rail": {
@@ -3861,6 +4008,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 4735,
       "h": 5918,
       "rail": {
@@ -3885,6 +4033,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 5036,
       "h": 6295,
       "rail": {
@@ -3909,6 +4058,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1024,
       "h": 1280,
       "rail": {
@@ -3933,6 +4083,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1023,
       "h": 1280,
       "rail": {
@@ -3957,6 +4108,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1024,
       "h": 1280,
       "rail": {
@@ -3981,6 +4133,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1200,
       "h": 1500,
       "rail": {
@@ -4005,6 +4158,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 5367,
       "h": 6709,
       "rail": {
@@ -4029,6 +4183,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6051,
       "h": 7564,
       "rail": {
@@ -4053,6 +4208,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 5354,
       "h": 4015,
       "rail": {
@@ -4077,6 +4233,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6048,
       "h": 4536,
       "rail": {
@@ -4101,6 +4258,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6048,
       "h": 4536,
       "rail": {
@@ -4125,6 +4283,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 4135,
       "h": 3101,
       "rail": {
@@ -4149,6 +4308,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6048,
       "h": 4536,
       "rail": {
@@ -4173,6 +4333,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 6048,
       "h": 4536,
       "rail": {
@@ -4197,6 +4358,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 5842,
       "h": 4381,
       "rail": {
@@ -4221,6 +4383,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3892,
       "h": 4865,
       "rail": {
@@ -4245,6 +4408,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3903,
       "h": 4879,
       "rail": {
@@ -4269,6 +4433,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3890,
       "h": 4862,
       "rail": {
@@ -4293,6 +4458,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3869,
       "h": 4836,
       "rail": {
@@ -4317,6 +4483,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 4000,
       "h": 5000,
       "rail": {
@@ -4341,6 +4508,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3662,
       "h": 4577,
       "rail": {
@@ -4365,6 +4533,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3734,
       "h": 4668,
       "rail": {
@@ -4389,6 +4558,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3533,
       "h": 4416,
       "rail": {
@@ -4413,6 +4583,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3885,
       "h": 4857,
       "rail": {
@@ -4437,6 +4608,7 @@
       "type": "photo",
       "onRail": false,
       "caption": "",
+      "role": "styling",
       "w": 3883,
       "h": 4854,
       "rail": {
@@ -4461,6 +4633,7 @@
       "type": "motion",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1920,
       "h": 1080,
       "duration": 45.8,
@@ -4493,6 +4666,7 @@
       "type": "motion",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 720,
       "h": 1280,
       "duration": 35.4,
@@ -4525,6 +4699,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1920,
       "h": 1280,
       "rail": {
@@ -4549,6 +4724,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1280,
       "h": 1920,
       "rail": {
@@ -4573,6 +4749,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1280,
       "h": 1920,
       "rail": {
@@ -4597,6 +4774,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1280,
       "h": 1920,
       "rail": {
@@ -4621,6 +4799,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1280,
       "h": 1920,
       "rail": {
@@ -4645,6 +4824,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1280,
       "h": 1920,
       "rail": {
@@ -4669,6 +4849,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1280,
       "h": 1920,
       "rail": {
@@ -4693,6 +4874,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3840,
       "h": 2160,
       "rail": {
@@ -4717,6 +4899,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3840,
       "h": 2160,
       "rail": {
@@ -4741,6 +4924,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3840,
       "h": 2160,
       "rail": {
@@ -4765,6 +4949,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3840,
       "h": 2160,
       "rail": {
@@ -4789,6 +4974,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3840,
       "h": 2160,
       "rail": {
@@ -4813,6 +4999,7 @@
       "type": "photo",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 3840,
       "h": 2160,
       "rail": {
@@ -4837,6 +5024,7 @@
       "type": "motion",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1080,
       "h": 1920,
       "duration": 15.2,
@@ -4869,6 +5057,7 @@
       "type": "motion",
       "onRail": true,
       "caption": "",
+      "role": "styling",
       "w": 1080,
       "h": 1920,
       "duration": 18.8,

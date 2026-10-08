@@ -10,12 +10,19 @@
   "telegram": "TODO",
   "labels": {
     "gallery": "wardrobe",
-    "contact": "contact"
+    "contact": "contact",
+    "model": "model",
+    "styling": "styling"
   },
   "categories": {
     "styling": "styling",
     "modeling": "modeling",
     "artdir + styling": "art direction + styling"
+  },
+  "roles": {
+    "modeling": "model",
+    "styling": "styling",
+    "artdir + styling": "styling"
   },
   "railMode": "mix",
   "railPerProject": 8,

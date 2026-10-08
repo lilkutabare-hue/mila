@@ -1,6 +1,6 @@
 // Strip: photos packed into columns that fill the whole viewport, infinite horizontal scroll.
 // One transform per frame on the track; nodes keep static left/top and only hop by loopW when they wrap.
-import { pickTier, preloadImage, REDUCED } from './media.js?v=4593352f';
+import { pickTier, preloadImage, REDUCED } from './media.js?v=2a63b5cc';
 
 export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, maxTier = 'full', onOpen }) {
   let looping = loop;                      // a band loops too once it is wider than the screen
@@ -47,7 +47,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   // phone: frames glued edge to edge in one row, each a random height, centred on the band line
   function layoutTight(list) {
     // one axis across the screen; every frame hangs on it with a small offset, so neighbours always overlap by well over half
-    const topSafe = 24, bottomSafe = Math.max(vh * 0.1, 96);
+    const topSafe = 56, bottomSafe = Math.max(vh * 0.1, 96);   // model / styling sit above the strip
     const free = vh - topSafe - bottomSafe;
     const axis = topSafe + free * (0.44 + rnd(list[0]?.item || {}).c * 0.12);   // 44–56% of the free band, chosen per visit
     let x = 0;
@@ -64,7 +64,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     const phone = vw < 700, tall = vh > vw;
     if (phone) return layoutTight(list);
     const maxW = vw * (phone ? 0.92 : 0.46), minH = vh * (phone ? 0.16 : 0.14);
-    const topSafe = phone ? 28 : 36, bottomSafe = Math.max(vh * 0.1, phone ? 104 : 116);   // nav + seal band below: photos never touch it
+    const topSafe = Math.max(vh * 0.07, 64), bottomSafe = Math.max(vh * 0.1, phone ? 104 : 116);   // model / styling above, nav below: photos never touch either
     let x = vw * 0.04, i = 0;
     while (i < list.length) {
       const lead = rnd(list[i].item);

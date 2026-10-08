@@ -21,6 +21,10 @@ export const MARKUP = `<div class="mh-bg" aria-hidden="true"></div>
   <a href="#/contact" id="nav-contact">contact</a>
   <a href="#/wardrobe" id="nav-gallery">wardrobe</a>
 </nav>
+<nav class="roles" aria-label="work">
+  <a href="#/model" id="nav-model">model</a>
+  <a href="#/styling" id="nav-styling">styling</a>
+</nav>
 
 <div id="viewer" class="viewer" role="dialog" aria-modal="true" aria-label="look" hidden>
   <div class="v-top"><span class="v-count" id="v-count"></span><button type="button" class="v-close" id="v-close">close</button></div>

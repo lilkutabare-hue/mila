@@ -335,6 +335,15 @@ async function stampVersion() {
   return v;
 }
 
+// ---------- role: model (mila in the frame) or styling; per work in meta.json, else by category in site.json ----------
+const ROLES = new Set(['model', 'styling']);
+function roleOf(site, cat, im) {
+  const own = String(im?.role || '').trim().toLowerCase();
+  if (ROLES.has(own)) return own;
+  const byCat = site.roles?.[cat];
+  return ROLES.has(byCat) ? byCat : /model/i.test(cat) ? 'model' : 'styling';
+}
+
 // ---------- main ----------
 async function main() {
   const t0 = Date.now();
@@ -354,7 +363,7 @@ async function main() {
     meta.projects[p.key] ??= { title: p.title, credits: '', link: '', order: null, railCount: null };
     meta.projects[p.key].link ??= '';
     meta.projects[p.key].year ??= '';
-    for (const it of p.items) meta.items[it.key] ??= { caption: '', hide: false, teaserStart: 0 };
+    for (const it of p.items) meta.items[it.key] ??= { caption: '', hide: false, teaserStart: 0, role: '' };
   }
 
   const usedSlugs = new Map();
@@ -373,7 +382,7 @@ async function main() {
   const results = await pmap(all, 4, async ({ p, it }) => {
     const im = meta.items[it.key]; const v = it.hash.slice(0, 6);
     const srcM = await mtime(it.path);
-    const entry = { id: it.id, project: p.slug, type: it.type, onRail: false, caption: im.caption || '' };
+    const entry = { id: it.id, project: p.slug, type: it.type, onRail: false, caption: im.caption || '', role: roleOf(site, p.category, im) };
     if (it.type === 'photo') {
       const outR = join(MEDIA, 'rail', `${it.id}.webp`), outF = join(MEDIA, 'full', `${it.id}.webp`), outS = join(MEDIA, 'small', `${it.id}.webp`);
       referenced.add(outR); referenced.add(outF); referenced.add(outS);
@@ -479,6 +488,7 @@ async function main() {
   console.log(`\n== media report (${((Date.now() - t0) / 1000).toFixed(1)} s) ==`);
   console.log(`projects: ${manifest.projects.length}, items: ${results.length} (${photos} photo, ${motion} motion)`);
   for (const p of manifest.projects) console.log(`  ${String(p.count).padStart(3)}  ${p.category} / ${p.title}  [${p.slug}]`);
+  console.log(`roles: model ${results.filter(e => e.role === 'model').length}, styling ${results.filter(e => e.role === 'styling').length}`);
   console.log(`tiers: small ${fmtMB(stats.small)}, rail ${fmtMB(stats.rail)} (photo avg ${fmtKB(avgRail)}), full ${fmtMB(stats.full)}, poster ${fmtMB(stats.poster)}`);
   if (report.empty.length) console.log(`empty folders (skipped): ${report.empty.join('; ')}`);
   if (report.dupes.length) console.log(`duplicates (skipped):\n  ${report.dupes.join('\n  ')}`);

@@ -29,6 +29,26 @@ img,video{display:block}
 /* wardrobe scrolls under the nav: give the nav a paper floor there */
 body.wardrobe-open .nav{bottom:0;padding:30px 0 calc(22px + var(--sai-b));mix-blend-mode:normal;color:var(--ink);background:linear-gradient(to top,var(--paper) 62%,rgba(242,240,235,0))}
 
+/* ===== roles: model / styling, two words at the top centre, mirroring the nav below ===== */
+.roles{position:fixed;left:0;right:0;top:calc(22px + var(--sai-t));z-index:40;display:flex;justify-content:center;align-items:center;gap:34px;font-size:11px;line-height:16px;letter-spacing:.02em;color:#fff;mix-blend-mode:difference;pointer-events:none;transition:opacity .2s}
+.roles a{pointer-events:auto;position:relative;padding:12px 8px;margin:-12px -8px;transition:opacity .3s}
+/* the picked word gets a hairline drawn in from the left; the other one steps back */
+.roles a::after{content:"";position:absolute;left:8px;right:8px;bottom:10px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right center;transition:transform .28s cubic-bezier(.7,0,.2,1)}
+.roles a.on::after{transform:scaleX(1);transform-origin:left center}
+.roles.picked a:not(.on){opacity:.4}
+@media (hover:hover){ .roles a:hover{opacity:.6} .roles.picked a:not(.on):hover{opacity:.75} }
+@media (max-width:899px){ .roles{top:calc(14px + var(--sai-t))} }
+/* a shoot, contact and the single-frame viewer own the top edge: the words step aside */
+body.project-open .roles,body.contact-open .roles,body.viewer-open .roles{opacity:0}
+body.project-open .roles a,body.contact-open .roles a,body.viewer-open .roles a{pointer-events:none}
+/* wardrobe scrolls under the words: a paper ceiling, as the nav has a floor */
+body.wardrobe-open .roles{top:0;padding:calc(22px + var(--sai-t)) 0 30px;mix-blend-mode:normal;color:var(--ink);background:linear-gradient(to bottom,var(--paper) 62%,rgba(242,240,235,0))}
+@media (max-width:899px){ body.wardrobe-open .roles{padding-top:calc(14px + var(--sai-t))} }
+.layer.wardrobe .scroll{padding-top:calc(76px + var(--sai-t))}
+@media (max-width:899px){ .layer.wardrobe .scroll{padding-top:calc(60px + var(--sai-t))} }
+/* switching roles: the strip fades out, refills, and fades back in */
+#stage.swap{opacity:0 !important;transition:opacity .2s}
+
 /* opaque paper under everything: hides whatever the host page (Tilda) renders above the body */
 .mh-bg{position:fixed;inset:0;z-index:0;background:var(--paper)}
 

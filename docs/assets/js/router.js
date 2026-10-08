@@ -1,4 +1,4 @@
-// Hash router: '' | #/wardrobe | #/wardrobe/<slug> | #/look/<id> | #/contact
+// Hash router: '' | #/model | #/styling | #/wardrobe | #/wardrobe/<slug> | #/look/<id> | #/contact
 export function parse(hash = location.hash) {
   const h = decodeURIComponent(hash).replace(/^#\/?/, '').replace(/\/+$/, '');
   if (!h) return { name: 'rail' };
@@ -6,6 +6,7 @@ export function parse(hash = location.hash) {
   if (a === 'wardrobe') return { name: 'wardrobe', slug: b || null };
   if (a === 'look' && b) return { name: 'look', id: b };
   if (a === 'contact') return { name: 'contact' };
+  if (a === 'model' || a === 'styling') return { name: 'role', role: a };
   if (a === 'p' && b) return { name: 'project', slug: b };
   return { name: 'rail' };
 }

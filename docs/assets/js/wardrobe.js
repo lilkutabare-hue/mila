@@ -1,10 +1,12 @@
-// Wardrobe: every work, by project, justified rows, lazy HQ loading.
-import { pickTier, esc } from './media.js?v=4593352f';
+// Wardrobe: every work, by project, justified rows, lazy HQ loading. With a role picked, only that side of the work.
+import { pickTier, esc } from './media.js?v=2a63b5cc';
 
-export function createWardrobe({ el, projects, onOpen }) {
+export function createWardrobe({ el, projects, role = null, onOpen }) {
   const scroll = el.querySelector('.scroll');
   const sectionsEl = el.querySelector('#sections');
-  let open = false, builtWidth = 0;
+  let open = false, builtWidth = 0, dirty = false;
+  const itemsOf = p => role ? p.itemObjs.filter(i => i.role === role) : p.itemObjs;
+  const shown = () => projects.filter(p => itemsOf(p).length);
   const tiles = new Map(); // item.id -> {el, item, w, h, tier, loaded}
 
   // ---- sections (built once, rows laid out per width)
@@ -22,16 +24,16 @@ export function createWardrobe({ el, projects, onOpen }) {
       tiles.set(item.id, { el: t, item, w: 0, h: 0, tier: null, loaded: false });
     }
   }
-  function render() { sectionsEl.replaceChildren(...projects.map(p => sections.get(p.slug))); layout(true); }
+  function render() { dirty = false; sectionsEl.replaceChildren(...shown().map(p => sections.get(p.slug))); layout(true); }
 
   function layout(force) {
     const W = sectionsEl.clientWidth; if (!W || (!force && W === builtWidth)) return;
     builtWidth = W;
     const phone = innerWidth < 900, targetH = phone ? 180 : 320, gap = 8;
-    for (const p of projects) {
+    for (const p of shown()) {
       const rowsEl = sections.get(p.slug).querySelector('.rows');
       const rows = []; let row = [], sumAR = 0;
-      for (const item of p.itemObjs) {
+      for (const item of itemsOf(p)) {
         const ar = item.w / item.h; row.push({ item, ar }); sumAR += ar;
         if (sumAR * targetH + gap * (row.length - 1) >= W) { rows.push({ row, h: (W - gap * (row.length - 1)) / sumAR }); row = []; sumAR = 0; }
       }
@@ -91,14 +93,18 @@ export function createWardrobe({ el, projects, onOpen }) {
   return {
     get isOpen() { return open; },
     open(slug) {
-      if (!open) { open = true; if (!sectionsEl.childElementCount) render(); else layout(false); }
+      if (!open) { open = true; if (!sectionsEl.childElementCount || dirty) render(); else layout(false); }
       if (slug && sections.has(slug)) {
         layout(false); sections.get(slug).scrollIntoView({ block: 'start' });
       }
       else layout(false);
     },
     close() { if (!open) return; open = false; for (const t of tiles.values()) t.el.querySelector('video')?.pause(); },
-    currentList() { return projects.flatMap(p => p.itemObjs); },
+    currentList() { return shown().flatMap(itemsOf); },
+    setRole(r) {
+      if (r === role) return; role = r;
+      if (open) { render(); scroll.scrollTop = 0; } else dirty = true;   // hidden: widths read 0, lay out on the next open
+    },
     relayout: () => layout(true),
   };
 }
