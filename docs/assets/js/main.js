@@ -1,13 +1,13 @@
-import { createStrip } from './strip.js?v=4bedbfa7';
-import { createWardrobe } from './wardrobe.js?v=4bedbfa7';
-import { createViewer } from './viewer.js?v=4bedbfa7';
-import { onRoute, navigate, back, parse } from './router.js?v=4bedbfa7';
-import { shuffle, esc } from './media.js?v=4bedbfa7';
+import { createStrip } from './strip.js?v=a1b9ccd2';
+import { createWardrobe } from './wardrobe.js?v=a1b9ccd2';
+import { createViewer } from './viewer.js?v=a1b9ccd2';
+import { onRoute, navigate, back, parse } from './router.js?v=a1b9ccd2';
+import { shuffle, esc } from './media.js?v=a1b9ccd2';
 
 // When embedded elsewhere (Tilda T123), window.MH_BASE points at the hosted folder; everything loads from there.
 const BASE = (window.MH_BASE || new URL('../../', import.meta.url).href).replace(/\/?$/, '/');
 const abs = u => (u && !/^(https?:)?\/\//.test(u) ? BASE + u : u);
-import { MARKUP } from './markup.js?v=4bedbfa7';
+import { MARKUP } from './markup.js?v=a1b9ccd2';
 if (!document.getElementById('stage')) document.body.insertAdjacentHTML('beforeend', MARKUP);
 const manifest = await (await fetch(BASE + 'data/manifest.json', { cache: 'no-cache' })).json();
 const site = manifest.site || {};
@@ -85,8 +85,8 @@ const contactEl = $('#contact');
 {
   const links = [];
   if (site.instagram) links.push(`<a href="https://instagram.com/${esc(site.instagram)}" target="_blank" rel="noopener">instagram</a>`);
-  if (tidy(site.email)) links.push(`<a href="mailto:${esc(site.email)}">${esc(site.email)}</a>`);
   if (tidy(site.telegram)) links.push(`<a href="https://t.me/${esc(site.telegram.replace(/^@/, ''))}" target="_blank" rel="noopener">telegram</a>`);
+  if (tidy(site.email)) links.push(`<a href="mailto:${esc(site.email)}">${esc(site.email)}</a>`);
   $('#contact-body').innerHTML = `<h1>${esc(site.name)}</h1>${role ? `<p class="role">${esc(role)}${tidy(site.city) ? `, ${esc(tidy(site.city))}` : ''}</p>` : ''}${links.map(l => `<p>${l}</p>`).join('')}`;
   contactEl.addEventListener('click', e => { if (e.target === contactEl || e.target.id === 'contact-body') back(home()); });
 }

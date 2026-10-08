@@ -96,11 +96,11 @@ body.project-open #stage,body.contact-open #stage{filter:blur(14px);opacity:.55}
 .contact.open{opacity:1}
 .contact .info{padding:0 24px calc(60px + var(--sai-b))}
 .contact{-webkit-font-smoothing:auto;color:#000}
-/* quiet, at the size of the shoot titles: the name, then the links */
-.contact h1{font:14px/1.4 var(--sans);text-transform:none;margin:0 0 10px;letter-spacing:.01em}
-.contact p{margin:0;font-size:14px;line-height:1.6}
+.contact h1{font:24px/1.15 var(--sans);text-transform:none;margin:0 0 6px;letter-spacing:-.01em}
+.contact p{margin:0;font-size:13px;line-height:1.5}
 .contact .role{display:none}
 .contact a{text-transform:none;padding:8px 6px;margin:-6px -6px;display:inline-block}
+@media (max-width:899px){ .contact h1{font-size:21px} .contact p{font-size:12px} }
 .contact a:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* ===== viewer (single work, from wardrobe or a shoot) ===== */
