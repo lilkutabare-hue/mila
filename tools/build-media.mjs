@@ -370,7 +370,7 @@ async function main() {
   for (const p of projects) {
     const pm = meta.projects[p.key];
     const title = (pm.title || p.title).trim() || p.title;
-    let slug = slugify(title); if (usedSlugs.has(slug)) { slug += '-' + (usedSlugs.get(slug) + 1); } usedSlugs.set(slugify(title), (usedSlugs.get(slugify(title)) || 1) + 1);
+    let slug = slugify(title); if (usedSlugs.has(slug)) { slug += '-' + usedSlugs.get(slug); } usedSlugs.set(slugify(title), (usedSlugs.get(slugify(title)) || 1) + 1);
     p.slug = slug; p.displayTitle = title;
     p.visible = pm.hide ? [] : p.items.filter(it => !meta.items[it.key]?.hide);   // a hidden shoot takes all its works with it
     for (const it of p.visible) it.id = `${slug}-${it.hash.slice(0, 6)}`;
