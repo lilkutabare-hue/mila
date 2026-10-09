@@ -79,7 +79,7 @@ npm run dev        # посмотреть локально: http://localhost:517
 | `description` | описание для поисковиков и превью в мессенджерах |
 | `url` | адрес сайта, например `https://milaharys.com` — нужен для корректного превью (og:image) при отправке ссылки |
 | `instagram`, `email`, `telegram` | контакты; `TODO` или пустая строка — ссылка не показывается |
-| `labels.gallery`, `labels.contact`, `labels.model`, `labels.styling` | подписи кнопок в навигации (`wardrobe`, `contact`, `model`, `styling`) |
+| `labels.gallery`, `labels.contact`, `labels.model`, `labels.styling` | подписи кнопок в навигации (`wardrobe`, `contact`, `modeling`, `styling`) |
 | `roles` | к какой кнопке относится категория по умолчанию: `"model"` или `"styling"` (отдельный кадр переназначается полем `role` в `meta.json`) |
 | `categories` | отображаемые названия категорий по имени папки |
 | `railMode` | `"projects"` — кадры одной съёмки идут подряд; `"mix"` — все кадры ленты вперемешку |

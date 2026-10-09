@@ -22,7 +22,7 @@ export const MARKUP = `<div class="mh-bg" aria-hidden="true"></div>
   <a href="#/wardrobe" id="nav-gallery">wardrobe</a>
 </nav>
 <nav class="roles" aria-label="work">
-  <a href="#/model" id="nav-model">model</a>
+  <a href="#/model" id="nav-model">modeling</a>
   <a href="#/styling" id="nav-styling">styling</a>
 </nav>
 
