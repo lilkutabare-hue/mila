@@ -1,21 +1,12 @@
 {
   "projects": {
-    "artdir + styling/Reincornation home": {
-      "title": "Reincornation home",
+    "modeling/for ai brand": {
+      "title": "For ai brand",
       "credits": "",
       "order": null,
       "railCount": null,
       "link": "",
-      "year": "2026"
-    },
-    "modeling/For A.K brand": {
-      "title": "For A.K brand",
-      "credits": "",
-      "order": null,
-      "railCount": null,
-      "link": "",
-      "year": "",
-      "hide": true
+      "year": "2025"
     },
     "modeling/For Angeldust": {
       "title": "For Angeldust",
@@ -33,14 +24,45 @@
       "link": "",
       "year": ""
     },
-    "modeling/For Capparel": {
-      "title": "For Capparel",
+    "modeling/for badlonmagazine": {
+      "title": "For badlonmagazine",
       "credits": "",
       "order": null,
       "railCount": null,
       "link": "",
-      "year": "2025",
-      "hide": true
+      "year": "2024"
+    },
+    "modeling/for bogema leningrad": {
+      "title": "For bogema leningrad",
+      "credits": "",
+      "order": null,
+      "railCount": null,
+      "link": "",
+      "year": ""
+    },
+    "modeling/For LAST SEEN": {
+      "title": "For LAST SEEN",
+      "credits": "",
+      "link": "",
+      "order": null,
+      "railCount": null,
+      "year": "2025"
+    },
+    "modeling/For Rel.cher": {
+      "title": "For Rel.cher",
+      "credits": "",
+      "link": "",
+      "order": null,
+      "railCount": null,
+      "year": "2026"
+    },
+    "modeling/For Rudy i eye": {
+      "title": "For Rudy i eye",
+      "credits": "",
+      "link": "",
+      "order": null,
+      "railCount": null,
+      "year": "2025"
     },
     "modeling/For Sorocolita": {
       "title": "For Sorocolita",
@@ -50,8 +72,32 @@
       "link": "",
       "year": "2026"
     },
+    "modeling/For Suel brand": {
+      "title": "For Suel brand",
+      "credits": "",
+      "order": null,
+      "railCount": null,
+      "link": "",
+      "year": ""
+    },
+    "modeling/Tests": {
+      "title": "Tests",
+      "credits": "",
+      "order": null,
+      "railCount": null,
+      "link": "",
+      "year": ""
+    },
     "styling/DEAD BLONDE x David GSPD for Glory Season": {
       "title": "DEAD BLONDE x David GSPD for Glory Season",
+      "credits": "",
+      "order": null,
+      "railCount": null,
+      "link": "",
+      "year": ""
+    },
+    "styling/Dice project": {
+      "title": "Dice project",
       "credits": "",
       "order": null,
       "railCount": null,
@@ -98,6 +144,14 @@
       "link": "",
       "year": ""
     },
+    "styling/For Ola Ola store": {
+      "title": "For Ola Ola store",
+      "credits": "",
+      "link": "",
+      "order": null,
+      "railCount": null,
+      "year": ""
+    },
     "styling/For Park by Osipchuk": {
       "title": "For Park by Osipchuk",
       "credits": "",
@@ -106,6 +160,14 @@
       "link": "",
       "year": "2023"
     },
+    "styling/For Sorocolita ": {
+      "title": "For Sorocolita",
+      "credits": "",
+      "order": null,
+      "railCount": null,
+      "link": "",
+      "year": "2026"
+    },
     "styling/For V.vintage store": {
       "title": "For V.vintage store",
       "credits": "",
@@ -113,6 +175,14 @@
       "railCount": null,
       "link": "",
       "year": "2026"
+    },
+    "styling/Nasty": {
+      "title": "Nasty",
+      "credits": "",
+      "order": null,
+      "railCount": null,
+      "link": "",
+      "year": ""
     },
     "styling/promo video for Kontrkult x Alexandriyskyi theatre.mp4": {
       "title": "promo video for Kontrkult x Alexandriyskyi theatre",
@@ -130,28 +200,20 @@
       "link": "",
       "year": ""
     },
+    "styling/Reincornation home": {
+      "title": "Reincornation home",
+      "credits": "",
+      "order": null,
+      "railCount": null,
+      "link": "",
+      "year": "2026"
+    },
     "styling/Saloma": {
       "title": "Saloma",
       "credits": "",
       "order": null,
       "railCount": null,
       "link": "",
-      "year": "2025"
-    },
-    "modeling/For Rel.cher": {
-      "title": "For Rel.cher",
-      "credits": "",
-      "link": "",
-      "order": null,
-      "railCount": null,
-      "year": "2026"
-    },
-    "modeling/For Rudy i eye": {
-      "title": "For Rudy i eye",
-      "credits": "",
-      "link": "",
-      "order": null,
-      "railCount": null,
       "year": "2025"
     },
     "styling/Saluki feat Toxis - Ventonyl": {
@@ -161,105 +223,9 @@
       "order": null,
       "railCount": null,
       "year": "2024"
-    },
-    "modeling/For LAST SEEN": {
-      "title": "For LAST SEEN",
-      "credits": "",
-      "link": "",
-      "order": null,
-      "railCount": null,
-      "year": "2025"
-    },
-    "styling/For Ola Ola store": {
-      "title": "For Ola Ola store",
-      "credits": "",
-      "link": "",
-      "order": null,
-      "railCount": null,
-      "year": ""
     }
   },
   "items": {
-    "artdir + styling/Reincornation home/802A8308.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "artdir + styling/Reincornation home/802A8328.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "artdir + styling/Reincornation home/802A8349.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "artdir + styling/Reincornation home/802A8354.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "artdir + styling/Reincornation home/802A8424.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "artdir + styling/Reincornation home/802A8440.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "artdir + styling/Reincornation home/802A8516.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "artdir + styling/Reincornation home/802A8546.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "artdir + styling/Reincornation home/802A8665.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "artdir + styling/Reincornation home/802A8681.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "artdir + styling/Reincornation home/802A8694.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For A.K brand/KG3A2462 1.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For A.K brand/KG3A2542.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For A.K brand/KG3A2762.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For A.K brand/KG3A3242 1-1.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For A.K brand/KG3A3289 1.jpg": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
     "modeling/For Angeldust/IMG_1746.JPG": {
       "caption": "",
       "hide": false,
@@ -335,52 +301,7 @@
       "hide": false,
       "teaserStart": 0
     },
-    "modeling/For Capparel/IMG_8475.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For Capparel/IMG_8477.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For Capparel/IMG_8483.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For Capparel/IMG_8484.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For Capparel/IMG_8496.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For Capparel/IMG_8498.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For Capparel/IMG_8499.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For Capparel/IMG_8854.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
     "modeling/For Sorocolita/IMG_8538.HEIC": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For Sorocolita/IMG_8583.JPG": {
       "caption": "",
       "hide": false,
       "teaserStart": 0
@@ -395,27 +316,12 @@
       "hide": false,
       "teaserStart": 0
     },
-    "modeling/For Sorocolita/IMG_8871.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
     "modeling/For Sorocolita/IMG_8884.JPG": {
       "caption": "",
       "hide": false,
       "teaserStart": 0
     },
-    "modeling/For Sorocolita/IMG_8895.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
     "modeling/For Sorocolita/IMG_8924.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0
-    },
-    "modeling/For Sorocolita/IMG_8955.JPG": {
       "caption": "",
       "hide": false,
       "teaserStart": 0
@@ -940,42 +846,6 @@
       "hide": false,
       "teaserStart": 0
     },
-    "modeling/For Sorocolita/IMG_9177.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0,
-      "role": "styling"
-    },
-    "modeling/For Sorocolita/IMG_9178.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0,
-      "role": "styling"
-    },
-    "modeling/For Sorocolita/IMG_9180.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0,
-      "role": "styling"
-    },
-    "modeling/For Sorocolita/IMG_9181.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0,
-      "role": "styling"
-    },
-    "modeling/For Sorocolita/IMG_9182.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0,
-      "role": "styling"
-    },
-    "modeling/For Sorocolita/IMG_9183.JPG": {
-      "caption": "",
-      "hide": false,
-      "teaserStart": 0,
-      "role": "styling"
-    },
     "styling/For Anteroom store/IMG_0751.JPG": {
       "caption": "",
       "hide": false,
@@ -1100,6 +970,337 @@
       "caption": "",
       "hide": false,
       "teaserStart": 0
+    },
+    "styling/Reincornation home/802A8308.jpg": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0
+    },
+    "styling/Reincornation home/802A8328.jpg": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0
+    },
+    "styling/Reincornation home/802A8349.jpg": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0
+    },
+    "styling/Reincornation home/802A8354.jpg": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0
+    },
+    "styling/Reincornation home/802A8424.jpg": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0
+    },
+    "styling/Reincornation home/802A8440.jpg": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0
+    },
+    "styling/Reincornation home/802A8516.jpg": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0
+    },
+    "styling/Reincornation home/802A8546.jpg": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0
+    },
+    "styling/Reincornation home/802A8665.jpg": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0
+    },
+    "styling/Reincornation home/802A8681.jpg": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0
+    },
+    "styling/Reincornation home/802A8694.jpg": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0
+    },
+    "modeling/for ai brand/IMG_2523.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for ai brand/IMG_2527.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for ai brand/IMG_2528.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for ai brand/IMG_2529.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for ai brand/IMG_2531.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for ai brand/IMG_2561.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for ai brand/IMG_2562.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for ai brand/IMG_2563.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for ai brand/IMG_2564.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for badlonmagazine/IMG_2591.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for badlonmagazine/IMG_2592.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for badlonmagazine/IMG_2593.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for badlonmagazine/IMG_2594.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for badlonmagazine/IMG_2595.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for badlonmagazine/IMG_2596.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for bogema leningrad/IMG_2216.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for bogema leningrad/IMG_2217.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for bogema leningrad/IMG_2218.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for bogema leningrad/IMG_2227.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/for bogema leningrad/IMG_2228.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/For Suel brand/IMG_2565.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/For Suel brand/IMG_2566.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/For Suel brand/IMG_2584.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/For Suel brand/IMG_2585.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/For Suel brand/IMG_2586.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/For Suel brand/IMG_2587.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/For Suel brand/IMG_2589.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/For Suel brand/IMG_2590.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/Tests/IMG_2575.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/Tests/IMG_2576.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/Tests/IMG_2577.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "modeling/Tests/IMG_2579.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/Dice project/-7925956786166429379.mp4": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/Dice project/IMG_2516.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/Dice project/IMG_2517.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/Dice project/IMG_2518.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/For Sorocolita /IMG_9177.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/For Sorocolita /IMG_9178.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/For Sorocolita /IMG_9180.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/For Sorocolita /IMG_9181.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/For Sorocolita /IMG_9182.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/For Sorocolita /IMG_9183.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/Nasty/IMG_0666.PNG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/Nasty/IMG_2569.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/Nasty/IMG_2572.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
+    },
+    "styling/Nasty/IMG_2573.JPG": {
+      "caption": "",
+      "hide": false,
+      "teaserStart": 0,
+      "role": ""
     }
   }
 }
