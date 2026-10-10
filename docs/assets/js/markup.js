@@ -11,8 +11,6 @@ export const MARKUP = `<div class="mh-bg" aria-hidden="true"></div>
   <div class="scroll">
     <div id="sections"></div>
   </div>
-  <div class="veil top" aria-hidden="true"></div>
-  <div class="veil bottom" aria-hidden="true"></div>
 </section>
 
 <section id="contact" class="contact" aria-label="contact">

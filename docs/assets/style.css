@@ -32,7 +32,7 @@ img,video{display:block}
 @keyframes glint{0%{background-position:100% 0}15%,100%{background-position:0 0}}
 @media (hover:hover){ .nav a:hover{opacity:.6} }
 @media (prefers-reduced-motion:reduce){ .nav a.on{animation:none;text-decoration:underline;text-underline-offset:3px} }
-/* wardrobe scrolls under the words: they stay exactly where they are, drawn in difference as everywhere; the layer's paper veil keeps them legible */
+/* the gallery scrolls under the two words: they stay exactly where they are, drawn in difference as over the strip */
 
 /* ===== roles: model / styling, two words at the top centre, mirroring the nav below ===== */
 .roles{position:fixed;left:0;right:0;top:calc(22px + var(--sai-t));z-index:40;display:flex;justify-content:center;align-items:center;gap:34px;font-size:11px;line-height:16px;letter-spacing:.02em;color:#fff;mix-blend-mode:difference;pointer-events:none;transition:opacity var(--t-1) var(--e-out)}
@@ -44,10 +44,11 @@ img,video{display:block}
 @media (hover:hover){ .roles a:hover{opacity:.6} .roles.picked a:not(.on):hover{opacity:.75} }
 @media (max-width:899px){ .roles{top:calc(14px + var(--sai-t))} }
 /* a shoot, contact and the single-frame viewer own the top edge: the words step aside */
-body.project-open .roles,body.contact-open .roles,body.viewer-open .roles{opacity:0}
-body.project-open .roles a,body.contact-open .roles a,body.viewer-open .roles a{pointer-events:none}
-.layer.wardrobe .scroll{padding-top:calc(76px + var(--sai-t))}
-@media (max-width:899px){ .layer.wardrobe .scroll{padding-top:calc(60px + var(--sai-t))} }
+body.project-open .roles,body.contact-open .roles,body.viewer-open .roles,body.wardrobe-open .roles{opacity:0}
+body.project-open .roles a,body.contact-open .roles a,body.viewer-open .roles a,body.wardrobe-open .roles a{pointer-events:none}
+/* gallery: nothing above the first shoot but air; on a phone the photos run edge to edge, the names keep a small gutter */
+.layer.wardrobe .scroll{padding-top:calc(40px + var(--sai-t))}
+@media (max-width:899px){ .layer.wardrobe .scroll{padding:calc(28px + var(--sai-t)) 0 calc(96px + var(--sai-b))} }
 /* switching roles: the new frames wait unseen until the first screen has decoded, then land */
 .stage.arriving .pic{opacity:0}
 
@@ -86,25 +87,16 @@ body.project-open #stage,body.contact-open #stage{filter:blur(8px);opacity:.55}
 .layer .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
   padding:calc(28px + var(--sai-t)) calc(var(--gutter) + var(--sai-r)) calc(96px + var(--sai-b)) calc(var(--gutter) + var(--sai-l))}
 
-/* wardrobe: titles and photos only */
-.section{margin-bottom:34px;content-visibility:auto;contain-intrinsic-size:auto 600px}   /* shoots off screen are not laid out or painted */
-@media (max-width:899px){ .section{margin-bottom:26px} .section-head{margin-bottom:6px} }
-.section-head{display:flex;gap:12px;margin:0 0 8px;font-size:14px;line-height:1.4;font-weight:400}
+/* gallery: photos first, names in the same small type as the navigation, generous air between shoots */
+.section{margin-bottom:56px;content-visibility:auto;contain-intrinsic-size:auto 600px}   /* shoots off screen are not laid out or painted */
+.section-head{display:flex;align-items:baseline;gap:10px;margin:0 0 10px;font-size:11px;line-height:16px;letter-spacing:.02em;font-weight:400}
+.section-head .yr{margin-left:0}
 .rows{display:flex;flex-direction:column;gap:var(--tile-gap,4px)}
 .row{display:flex;gap:var(--tile-gap,4px)}
-@media (max-width:899px){ .rows{--tile-gap:3px} }
+@media (max-width:899px){ .section{margin-bottom:40px} .section-head{margin:0 0 8px;padding:0 calc(14px + var(--sai-l))} .rows{--tile-gap:2px} }
 .tile{position:relative;background:var(--ghost);overflow:hidden;cursor:pointer;flex:none}
 .tile img,.tile video{width:100%;height:100%;object-fit:cover}
 .empty{color:var(--muted);padding:20px 0}
-/* the wardrobe's top and bottom edges: paper under the words, then a soft fade on an ease-out curve so no line shows.
-   The band the words sit in is solid paper, so in difference they read exactly as over the strip; no blur, the photos
-   pass under as they are */
-.veil{position:absolute;left:0;right:0;z-index:2;pointer-events:none;
-  background:linear-gradient(var(--dir),var(--paper) 0%,var(--paper) var(--solid),rgba(242,240,235,.86) calc(var(--solid) + (100% - var(--solid)) * .14),rgba(242,240,235,.68) calc(var(--solid) + (100% - var(--solid)) * .3),rgba(242,240,235,.48) calc(var(--solid) + (100% - var(--solid)) * .46),rgba(242,240,235,.28) calc(var(--solid) + (100% - var(--solid)) * .62),rgba(242,240,235,.12) calc(var(--solid) + (100% - var(--solid)) * .8),rgba(242,240,235,0) 100%)}
-.veil.top{--dir:to bottom;top:0;height:calc(84px + var(--sai-t));--solid:calc(44px + var(--sai-t))}
-.veil.bottom{--dir:to top;bottom:0;height:calc(104px + var(--sai-b));--solid:calc(46px + var(--sai-b))}
-@media (max-width:899px){ .veil.top{height:calc(72px + var(--sai-t));--solid:calc(36px + var(--sai-t))} .veil.bottom{height:calc(84px + var(--sai-b));--solid:calc(36px + var(--sai-b))} }
-
 /* contact: translucent paper over the strip, centred text */
 .contact{position:fixed;inset:0;z-index:20;background:rgba(242,240,235,.72);display:flex;align-items:center;justify-content:center;text-align:center;opacity:0;visibility:hidden;cursor:default;
   transition:opacity var(--t-3) var(--e-out),visibility 0s linear var(--t-3)}
