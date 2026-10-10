@@ -182,6 +182,14 @@ async function buildVideo(src, info, teaserStart, outRail, outFull, outPosterRai
   const pf = await sharp(frame).resize({ width: TIER.fullLong, height: TIER.fullLong, fit: 'inside', withoutEnlargement: true }).webp({ quality: TIER.fullQ }).toFile(outPosterFull);
   return { posterRail: { w: pr.width, h: pr.height }, posterFull: { w: pf.width, h: pf.height } };
 }
+// the tone a frame shows before its photo arrives: the mean colour of the small output, as #rrggbb
+// (sharp's `dominant` is binned to 16 levels and lands on near-black for most dark shoots; the mean reads as the photo)
+async function dominantColor(file) {
+  try {
+    const { channels } = await sharp(file).resize(64, 64, { fit: 'inside' }).stats();
+    return '#' + channels.slice(0, 3).map(c => Math.round(c.mean).toString(16).padStart(2, '0')).join('');
+  } catch { return null; }
+}
 async function videoSize(p) {
   const { stdout } = await run(FFPROBE, ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', p]);
   const [w, h] = stdout.trim().split(',').map(Number); return { w, h };
@@ -347,6 +355,11 @@ function roleOf(site, cat, im) {
 // ---------- main ----------
 async function main() {
   const t0 = Date.now();
+  if (!existsSync(SRC)) {   // a machine without the sources (code-only edits): just stamp the version so caches turn over
+    const codeV = await stampVersion();
+    console.log(`no media-src here: media untouched, code version ${codeV}`);
+    return;
+  }
   const site = await readJSON(join(CONTENT, 'site.json'), {});
   const meta = await readJSON(join(CONTENT, 'meta.json'), { projects: {}, items: {} });
   meta.projects ||= {}; meta.items ||= {};
@@ -397,6 +410,8 @@ async function main() {
         entry.rail = s.rail; entry.full = s.full; entry.small = s.small;
         cache[it.id] = { rail: s.rail, full: s.full, small: s.small };
       }
+      cache[it.id].color ??= await dominantColor(outS);
+      entry.color = cache[it.id].color;
       entry.small = { src: `media/small/${it.id}.webp?v=${v}`, w: entry.small.w, h: entry.small.h };
       entry.rail = { src: `media/rail/${it.id}.webp?v=${v}`, w: entry.rail.w, h: entry.rail.h };
       entry.full = { src: `media/full/${it.id}.webp?v=${v}`, w: entry.full.w, h: entry.full.h };
@@ -429,6 +444,8 @@ async function main() {
         sizes.rail = await videoSize(outR); sizes.full = await videoSize(outF); sizes.small = existsSync(outS) ? await videoSize(outS) : null; sizes.teaserStart = ts;
         cache[it.id] = sizes;
       }
+      sizes.color ??= await dominantColor(pR);
+      entry.color = sizes.color;
       entry.rail = { src: `media/rail/${it.id}.mp4?v=${v}`, w: sizes.rail.w, h: sizes.rail.h };
       entry.full = { src: `media/full/${it.id}.mp4?v=${v}`, w: sizes.full.w, h: sizes.full.h };
       if (sizes.small) entry.small = { src: `media/small/${it.id}.mp4?v=${v}`, w: sizes.small.w, h: sizes.small.h };

@@ -1,5 +1,5 @@
 // Wardrobe: every work, by project, justified rows, lazy HQ loading. With a role picked, only that side of the work.
-import { pickTier, esc, REDUCED } from './media.js?v=93f9f0d7';
+import { pickTier, esc, REDUCED } from './media.js?v=bda562e2';
 
 export function createWardrobe({ el, projects, role = null, onOpen }) {
   const scroll = el.querySelector('.scroll');
@@ -22,6 +22,7 @@ export function createWardrobe({ el, projects, role = null, onOpen }) {
       const t = document.createElement('button');
       t.type = 'button'; t.className = 'tile'; t.dataset.id = item.id;
       t.setAttribute('aria-label', `${p.title} — ${item.type === 'motion' ? 'video' : 'photo'}`);
+      if (item.color) t.style.background = item.color;   // the tile is in the photo's own tone until it arrives
       t.addEventListener('click', () => onOpen(item));
       tiles.set(item.id, { el: t, item, w: 0, h: 0, tier: null, loaded: false });
     }
@@ -56,6 +57,8 @@ export function createWardrobe({ el, projects, role = null, onOpen }) {
         frag.appendChild(rowEl);
       }
       rowsEl.replaceChildren(frag);
+      const sec = sections.get(p.slug), headH = sec.querySelector('.section-head').offsetHeight || 28;
+      sec.style.containIntrinsicSize = `auto ${Math.round(headH + rows.reduce((a, r) => a + Math.round(r.h), 0) + gap * Math.max(0, rows.length - 1))}px`;
     }
     observeAll();
   }
@@ -70,7 +73,7 @@ export function createWardrobe({ el, projects, role = null, onOpen }) {
     if (item.type === 'photo') {
       t.tier = pickTier(item, t.w, t.h);
       const img = new Image(); img.decoding = 'async'; img.alt = '';
-      img.onload = () => t.el.classList.add('loaded');
+      img.onload = () => img.decode().catch(() => {}).then(() => t.el.classList.add('loaded'));   // shown only once decoded: no blank first frames
       img.onerror = () => { console.warn('tile failed:', item.id); t.el.remove(); tiles.delete(item.id); item.projectObj.itemObjs = item.projectObj.itemObjs.filter(i => i !== item); layout(true); };
       img.src = item[t.tier].src; t.el.prepend(img);
     } else {

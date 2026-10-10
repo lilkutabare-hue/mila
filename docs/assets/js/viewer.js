@@ -1,5 +1,5 @@
 // Full-screen viewer: a look taken off the hanger.
-import { pickTier, preloadImage, fmtTime, pad3, esc, REDUCED } from './media.js?v=93f9f0d7';
+import { pickTier, preloadImage, fmtTime, pad3, esc, REDUCED } from './media.js?v=bda562e2';
 
 const EASE = 'cubic-bezier(.2,.7,.1,1)';
 
@@ -42,6 +42,7 @@ export function createViewer({ el, railRectOf, setTaken, centerRail, isOnRail, o
     const fit = fitRect(item);
     const b = document.createElement('div'); b.className = 'v-media';
     b.style.width = fit.w + 'px'; b.style.height = fit.h + 'px';
+    if (item.color) b.style.background = item.color;
     if (item.type === 'photo') {
       const lq = new Image(); lq.className = 'lq'; lq.alt = ''; lq.decoding = 'async'; lq.src = item.rail.src; b.appendChild(lq);
       if (pickTier(item, fit.w, fit.h) === 'full') {

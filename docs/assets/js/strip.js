@@ -1,6 +1,6 @@
 // Strip: photos packed into columns that fill the whole viewport, infinite horizontal scroll.
 // One transform per frame on the track; nodes keep static left/top and only hop by loopW when they wrap.
-import { pickTier, preloadImage, REDUCED } from './media.js?v=93f9f0d7';
+import { pickTier, preloadImage, REDUCED } from './media.js?v=bda562e2';
 
 export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, maxTier = 'full', onOpen }) {
   let looping = loop;                      // a band loops too once it is wider than the screen
@@ -17,6 +17,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   function makeNode(item, clone = false) {
     const el = document.createElement('button');
     el.className = 'pic'; el.type = 'button';
+    if (item.color) el.style.background = item.color;   // the frame is in the photo's own tone until it arrives
     if (clone) { el.setAttribute('aria-hidden', 'true'); el.tabIndex = -1; } else el.setAttribute('aria-label', item.projectObj.title);
     const node = { item, el, media: null, loaded: false, w: 0, h: 0, x: 0, top: 0, k: null, visible: false, clone, playing: false };
     el.addEventListener('tap', () => onOpen?.(item, node));
@@ -171,15 +172,14 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   }
 
   // ---------- frame ----------
-  let sizeCheck = 0;
+  // the loop runs only while something changes: scroll, glide, pull, a swap, images still arriving.
+  // at rest nothing is written and no frame is requested; input and layout call run() to wake it
+  let moreToLoad = false;
+  const busy = () => pos !== target || dragY !== dragYTarget || inVel !== 0 || !!ptr || pending > 0 || moreToLoad;
   function frame(now) {
-    raf = requestAnimationFrame(frame);
-    if (firstScreen && now - last > 0 && sizeCheck > 30) firstScreen = false;
-    if (++sizeCheck % 20 === 0 && !ptr) { // every ~third of a second: did the viewport change under us?
-      const w = stage.clientWidth || innerWidth, h = stage.clientHeight || innerHeight;
-      if (Math.abs(w - vw) > 1 || Math.abs(h - vh) > vh * 0.15) build(nodes.find(n => n.visible)?.item || null);
-    }
+    raf = 0;
     tick(now);
+    if (active && busy()) raf = requestAnimationFrame(frame);
   }
   function tick(now) {
     const dt = Math.max(0, Math.min(50, now - last || 16.67)); last = now;
@@ -197,6 +197,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     const ahead = vw * 1.25 + Math.min(vw * 4, speed * 1.5);
     const lo = pos - pad, hi = pos + vw + pad;  // world window that may be on screen
     let bgNode = null, bgDist = Infinity;       // nearest frame that is not loaded yet
+    const motion = [];                          // visible videos with their on-screen share; only the most visible play
     for (const node of nodes) {
       let left = node.x;
       if (looping) { // choose the copy of this node whose world x lies in [pos - pad, pos - pad + loopW)
@@ -213,9 +214,16 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
       else if (!node.loaded) { const d = Math.abs(lx + node.w / 2 - vw / 2); if (d < bgDist) { bgDist = d; bgNode = node; } }
       if (on) {
         if (!node.visible) { node.visible = true; node.el.classList.remove('off'); node.el.style.willChange = 'transform'; }
-        if (node.item.type === 'motion') playVideo(node, (Math.min(vw, sx + node.w) - Math.max(0, sx)) / node.w);
+        if (node.item.type === 'motion') motion.push({ node, frac: (Math.min(vw, sx + node.w) - Math.max(0, sx)) / node.w });
       } else if (node.visible) { node.visible = false; node.el.classList.add('off'); node.el.style.willChange = ''; if (node.item.type === 'motion') playVideo(node, 0); }
     }
+    if (motion.length) { // phone: one teaser at a time, desktop: two; the rest rest on their posters
+      motion.sort((a, b) => b.frac - a.frac);
+      const slots = phone ? 1 : 2;
+      motion.forEach((m, i) => playVideo(m.node, i < slots ? m.frac : 0));
+    }
+    moreToLoad = !!bgNode;
+    if (firstScreen && pending === 0) firstScreen = false;   // the first screen has decoded: the rest may trickle in
     preloadNext(bgNode);
   }
 
@@ -230,14 +238,15 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     let d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
     if (e.deltaMode === 1) d *= 16; else if (e.deltaMode === 2) d *= vw;
     target += d;
-    const now = e.timeStamp, gap = Math.max(8, now - wheelPrev); wheelPrev = now; lastInput = now;
+    const now = e.timeStamp; wheelPrev = now; lastInput = now;
     inVel = 0;                                              // no glide after the wheel: plain scroll, sideways
+    run();
   }, { passive: false });
   let ptr = null;
   stage.addEventListener('pointerdown', e => {
     if (!active || e.button !== 0) return;
     ptr = { id: e.pointerId, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, axis: e.pointerType === 'mouse' && !swipeDown ? 'x' : null, samples: [], moved: false, hit: e.target.closest('.pic') };
-    try { stage.setPointerCapture(e.pointerId); } catch {} target = pos; inVel = 0;
+    try { stage.setPointerCapture(e.pointerId); } catch {} target = pos; inVel = 0; run();
   });
   stage.addEventListener('pointermove', e => {
     if (!ptr || e.pointerId !== ptr.id) return;
@@ -246,14 +255,14 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     if (!ptr.moved && Math.hypot(e.clientX - ptr.sx, e.clientY - ptr.sy) > 6) { ptr.moved = true; stage.classList.add('dragging'); }
     if (ptr.axis === 'y' && swipeDown) { dragY = dragYTarget = Math.max(0, e.clientY - ptr.sy); }
     else target -= ptr.axis === 'x' ? dx : dy;
-    ptr.x = e.clientX; ptr.y = e.clientY;
+    ptr.x = e.clientX; ptr.y = e.clientY; run();
     ptr.samples.push({ t: e.timeStamp, p: target }); ptr.samples = ptr.samples.filter(s => e.timeStamp - s.t <= 100);
   });
   const endPtr = e => {
     if (!ptr || e.pointerId !== ptr.id) return;
     const s = ptr.samples;
     if (s.length >= 2) { const a = s[0], b = s[s.length - 1]; const v = (b.p - a.p) / Math.max(1, b.t - a.t) * 1000; if (Math.abs(v) > 50 && vw < 700) { inVel = v * 0.45; lastInput = 0; } }
-    const { moved, hit, axis, sy } = ptr; ptr = null; stage.classList.remove('dragging');
+    const { moved, hit, axis, sy } = ptr; ptr = null; stage.classList.remove('dragging'); run();
     suppressClick = true; setTimeout(() => { suppressClick = false; }, 0);
     if (swipeDown && axis === 'y') {
       if (e.type === 'pointerup' && e.clientY - sy > 90) { stage.dispatchEvent(new CustomEvent('swipedown')); setTimeout(() => { dragY = dragYTarget = 0; }, 400); }
@@ -275,7 +284,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
       case 'Home': target = 0; break;
       default: return;
     }
-    e.preventDefault();
+    e.preventDefault(); run();
   });
   let rt = 0;
   const relayout = () => {
@@ -283,6 +292,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     rt = setTimeout(() => {
       const w = stage.clientWidth || innerWidth, h = stage.clientHeight || innerHeight;
       if (Math.abs(w - vw) > 1 || Math.abs(h - vh) > vh * 0.15) build(nodes.find(n => n.visible)?.item || null);
+      run();
     }, 150);
   };
   addEventListener('resize', relayout);
@@ -290,10 +300,10 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   visualViewport?.addEventListener('resize', relayout);
   if (typeof ResizeObserver !== 'undefined') new ResizeObserver(relayout).observe(stage);
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else if (active) run(); });
-  function run() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  function run() { if (active && !raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
   function stop() { cancelAnimationFrame(raf); raf = 0; }
 
-  function setItems(list) { live = list.slice(); for (const n of nodes) n.el.remove(); for (const [, n] of base) n.el.remove(); track.replaceChildren(); base = new Map(); nodes = []; if (active) build(null); }
+  function setItems(list) { live = list.slice(); for (const n of nodes) n.el.remove(); for (const [, n] of base) n.el.remove(); track.replaceChildren(); base = new Map(); nodes = []; if (active) { build(null); run(); } }
 
   // ---------- swap: a new set of frames ----------
   // the frames on screen lift and turn away like riffled cards, blurring out one after another;
@@ -336,7 +346,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     },
     setItems, swap,
     get active() { return active; },
-    nudge(d) { target += d; },
+    nudge(d) { target += d; run(); },
     stats: () => ({ pos, target, loopW, pad, nodes: nodes.length, vw, vh, inVel }),
     debugNodes: () => nodes,
   };

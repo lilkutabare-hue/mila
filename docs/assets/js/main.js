@@ -1,13 +1,13 @@
-import { createStrip } from './strip.js?v=93f9f0d7';
-import { createWardrobe } from './wardrobe.js?v=93f9f0d7';
-import { createViewer } from './viewer.js?v=93f9f0d7';
-import { onRoute, navigate, back, parse } from './router.js?v=93f9f0d7';
-import { shuffle, esc } from './media.js?v=93f9f0d7';
+import { createStrip } from './strip.js?v=bda562e2';
+import { createWardrobe } from './wardrobe.js?v=bda562e2';
+import { createViewer } from './viewer.js?v=bda562e2';
+import { onRoute, navigate, back, parse } from './router.js?v=bda562e2';
+import { shuffle, esc } from './media.js?v=bda562e2';
 
 // When embedded elsewhere (Tilda T123), window.MH_BASE points at the hosted folder; everything loads from there.
 const BASE = (window.MH_BASE || new URL('../../', import.meta.url).href).replace(/\/?$/, '/');
 const abs = u => (u && !/^(https?:)?\/\//.test(u) ? BASE + u : u);
-import { MARKUP } from './markup.js?v=93f9f0d7';
+import { MARKUP } from './markup.js?v=bda562e2';
 if (!document.getElementById('stage')) document.body.insertAdjacentHTML('beforeend', MARKUP);
 const manifest = await (await fetch(BASE + 'data/manifest.json', { cache: 'no-cache' })).json();
 const site = manifest.site || {};
@@ -124,7 +124,7 @@ for (const [r, a] of navRoles) {
 paintRoles();
 
 // ---- layers
-let layerOpen = null, currentProject = null, currentItems = [], currentKey = '';
+let layerOpen = null, currentProject = null, currentItems = [], currentKey = '', stageFx = 0;
 const layers = { project: $('#project'), wardrobe: $('#wardrobe'), contact: contactEl };
 // the open word leads back to the strip, filtered as it was
 function paintNav() {
@@ -137,6 +137,9 @@ function showLayer(which) {
     if (on) { clearTimeout(el._t); if (el.hidden) { el.hidden = false; void el.offsetWidth; } el.classList.add('open'); }
     else if (!el.hidden) { el.classList.remove('open'); clearTimeout(el._t); el._t = setTimeout(() => { el.hidden = true; }, 380); }
   }
+  // the strip under a shoot or contact blurs: promote it for the transition only
+  const blurring = (which === 'project' || which === 'contact') !== (layerOpen === 'project' || layerOpen === 'contact');
+  if (blurring) { clearTimeout(stageFx); document.body.classList.add('stage-fx'); stageFx = setTimeout(() => document.body.classList.remove('stage-fx'), 560); }
   layerOpen = which;
   document.body.classList.toggle('layer-open', !!which);
   document.body.classList.toggle('project-open', which === 'project');
