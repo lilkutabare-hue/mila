@@ -1,6 +1,10 @@
 // Media helpers: tier selection, preloading, formatting.
 export const REDUCED = matchMedia('(prefers-reduced-motion: reduce)');
 
+// motion tokens, the same as --e-out / --e-io / --t-1..3 in style.css: two curves, three durations, used everywhere
+export const E_OUT = 'cubic-bezier(.2,.7,.1,1)', E_IO = 'cubic-bezier(.7,0,.2,1)';
+export const T1 = 180, T2 = 360, T3 = 600;
+
 // A tile whose physical height fits in the rail tier gets rail; anything bigger gets full.
 export function pickTier(item, cssW, cssH) {
   const need = cssH * (devicePixelRatio || 1);

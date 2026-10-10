@@ -1,9 +1,7 @@
 // Full-screen viewer: a look taken off the hanger.
-import { pickTier, preloadImage, fmtTime, pad3, esc, REDUCED } from './media.js?v=cfca17ce';
+import { pickTier, preloadImage, fmtTime, pad3, esc, REDUCED, E_OUT, T1, T2 } from './media.js?v=6c4a6f03';
 
-const EASE = 'cubic-bezier(.2,.7,.1,1)';
-
-export function createViewer({ el, railRectOf, setTaken, centerRail, isOnRail, onNavigate, onClose }) {
+export function createViewer({ el, setTaken, centerRail, isOnRail, onNavigate, onClose }) {
   const settle = (anim, ms) => Promise.race([anim.finished.catch(() => {}), new Promise(r => setTimeout(r, ms))]);
   const stage = el.querySelector('#v-stage'), bottom = el.querySelector('#v-bottom'), countEl = el.querySelector('#v-count');
   const closeBtn = el.querySelector('#v-close'), prevBtn = el.querySelector('#v-prev'), nextBtn = el.querySelector('#v-next');
@@ -46,8 +44,8 @@ export function createViewer({ el, railRectOf, setTaken, centerRail, isOnRail, o
     if (item.type === 'photo') {
       const lq = new Image(); lq.className = 'lq'; lq.alt = ''; lq.decoding = 'async'; lq.src = item.rail.src; b.appendChild(lq);
       if (pickTier(item, fit.w, fit.h) === 'full') {
-        const hq = new Image(); hq.className = 'hq'; hq.alt = ''; hq.decoding = 'async'; b.appendChild(hq);
-        preloadImage(item.full.src).then(() => { if (!b.isConnected) return; hq.src = item.full.src; hq.decode().catch(() => {}).then(() => hq.classList.add('ready')); }).catch(e => console.warn(e.message));
+        const hq = new Image(); hq.className = 'hq media'; hq.alt = ''; hq.decoding = 'async'; b.appendChild(hq);
+        preloadImage(item.full.src).then(() => { if (!b.isConnected) return; hq.src = item.full.src; hq.decode().catch(() => {}).then(() => hq.classList.add('in')); }).catch(e => console.warn(e.message));
       }
     } else {
       const v = document.createElement('video');
@@ -93,14 +91,8 @@ export function createViewer({ el, railRectOf, setTaken, centerRail, isOnRail, o
     el.hidden = false; open = true;
     const fit = show(item);
     void el.offsetWidth; el.classList.add('open');
-    if (REDUCED.matches) { box.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 150 }); }
-    else if (fromRect && source === 'rail') {
-      takenId = item.id; setTaken(item.id, true);
-      const s = fromRect.width / fit.w, dx = fromRect.left - fit.left, dy = fromRect.top - fit.top;
-      box.animate([{ transform: `translate(${dx}px,${dy}px) scale(${s})` }, { transform: 'none' }], { duration: 420, easing: EASE });
-    } else {
-      box.animate([{ opacity: 0, transform: 'scale(.96)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: EASE });
-    }
+    // the frame resolves out of a soft blur; nothing travels or scales
+    if (!REDUCED.matches) box.animate([{ opacity: 0, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0px)' }], { duration: T2, easing: E_OUT });
     closeBtn.focus({ preventScroll: true });
   }
   function finish() {
@@ -113,17 +105,10 @@ export function createViewer({ el, railRectOf, setTaken, centerRail, isOnRail, o
   function api_close({ animate = true } = {}) {
     if (!open || closing) return; closing = true;
     if (video) video.pause();
-    const id = cur.id;
-    const to = animate && source === 'rail' && !REDUCED.matches ? railRectOf(id) : null;
     el.classList.add('fading');
     const done = () => { el.classList.remove('fading'); finish(); };
-    if (to && box) {
-      const fit = box.getBoundingClientRect();
-      const s = to.width / fit.width, dx = to.left - fit.left, dy = to.top - fit.top;
-      settle(box.animate([{ transform: 'none' }, { transform: `translate(${dx}px,${dy}px) scale(${s})` }], { duration: 420, easing: EASE, fill: 'forwards' }), 500).then(done);
-    } else if (box) {
-      settle(box.animate([{ opacity: 1 }, { opacity: 0 }], { duration: REDUCED.matches ? 150 : 200, fill: 'forwards' }), 260).then(done);
-    } else done();
+    if (box && animate && !REDUCED.matches) settle(box.animate([{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(6px)' }], { duration: T2, easing: E_OUT, fill: 'forwards' }), T2 + 60).then(done);
+    else done();
   }
   function step(d) { if (list.length < 2) return; onNavigate(list[(idx() + d + list.length) % list.length]); }
 
@@ -155,7 +140,7 @@ export function createViewer({ el, railRectOf, setTaken, centerRail, isOnRail, o
     if (!sw || e.pointerId !== sw.id) return;
     const dx = e.clientX - sw.x, dy = e.clientY - sw.y, dt = Math.max(1, e.timeStamp - sw.t);
     const vx = Math.abs(dx) / dt * 1000, vy = dy / dt * 1000;
-    if (box) { box.style.transition = 'transform .2s'; box.style.transform = ''; setTimeout(() => { if (box) box.style.transition = ''; }, 220); }
+    if (box) { box.style.transition = `transform ${T1}ms ${E_OUT}`; box.style.transform = ''; setTimeout(() => { if (box) box.style.transition = ''; }, T1 + 20); }   // the gesture settles back
     sw = null;
     if (e.pointerType === 'mouse') return;
     if (phone() && dy > 80 && Math.abs(dy) > Math.abs(dx) || vy > 700 && dy > 30) { onClose(); return; }

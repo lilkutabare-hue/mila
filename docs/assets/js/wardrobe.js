@@ -1,12 +1,13 @@
 // Wardrobe: every work, by project, justified rows, lazy HQ loading. With a role picked, only that side of the work.
-import { pickTier, esc, REDUCED } from './media.js?v=cfca17ce';
+import { pickTier, esc, REDUCED, E_OUT, E_IO, T2, T3 } from './media.js?v=6c4a6f03';
 
 export function createWardrobe({ el, projects, role = null, onOpen }) {
   const scroll = el.querySelector('.scroll');
   const sectionsEl = el.querySelector('#sections');
   let open = false, builtWidth = 0, dirty = false, swapId = 0;
-  const W_OUT = [{ opacity: 0, filter: 'blur(8px)', transform: 'translateY(-12px)' }];
-  const W_IN = [{ opacity: 0, filter: 'blur(10px)', transform: 'translateY(-12px)' }, { opacity: 1, filter: 'blur(0px)', transform: 'none' }];
+  const W_OUT = [{ opacity: 0, filter: 'blur(8px)' }];
+  const W_IN = [{ opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)' }];
+  const STEP = 30;
   const itemsOf = p => role ? p.itemObjs.filter(i => i.role === role) : p.itemObjs;
   const shown = () => projects.filter(p => itemsOf(p).length);
   const tiles = new Map(); // item.id -> {el, item, w, h, tier, loaded}
@@ -72,16 +73,17 @@ export function createWardrobe({ el, projects, role = null, onOpen }) {
     const { item } = t;
     if (item.type === 'photo') {
       t.tier = pickTier(item, t.w, t.h);
-      const img = new Image(); img.decoding = 'async'; img.alt = '';
-      img.onload = () => img.decode().catch(() => {}).then(() => t.el.classList.add('loaded'));   // shown only once decoded: no blank first frames
+      const img = new Image(); img.decoding = 'async'; img.alt = ''; img.className = 'media';
+      img.onload = () => img.decode().catch(() => {}).then(() => { t.el.classList.add('loaded'); img.classList.add('in'); });   // shown only once decoded: no blank first frames
       img.onerror = () => { console.warn('tile failed:', item.id); t.el.remove(); tiles.delete(item.id); item.projectObj.itemObjs = item.projectObj.itemObjs.filter(i => i !== item); layout(true); };
       img.src = item[t.tier].src; t.el.prepend(img);
     } else {
       const v = document.createElement('video');
-      v.muted = true; v.playsInline = true; v.loop = true; v.preload = 'none';
+      v.muted = true; v.playsInline = true; v.loop = true; v.preload = 'none'; v.className = 'media';
       v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
       const pt = pickTier(item, t.w, t.h); v.poster = item.poster[pt === 'full' ? 'full' : 'rail']; v.src = (pt === 'small' && item.small ? item.small : item.rail).src;
       t.el.classList.add('loaded'); t.el.prepend(v); vio.observe(t.el);
+      requestAnimationFrame(() => v.classList.add('in'));
     }
   }
   const RANK = { small: 0, rail: 1, full: 2 };
@@ -109,16 +111,16 @@ export function createWardrobe({ el, projects, role = null, onOpen }) {
     setRole(r) {
       if (r === role) return; role = r;
       if (!open) { dirty = true; return; }   // hidden: widths read 0, lay out on the next open
-      // the shoots on screen lift away blurred, one after another; the new ones settle in from the same height
+      // the shoots on screen dissolve into a blur, top to bottom; the new ones resolve the same way
       const id = ++swapId;
       const seen = () => [...sectionsEl.children].filter(sec => { const b = sec.getBoundingClientRect(); return b.bottom > 0 && b.top < innerHeight; });
       const refill = () => { render(); scroll.scrollTop = 0; };
       if (REDUCED.matches) { refill(); return; }
-      Promise.all(seen().map((sec, i) => sec.animate(W_OUT, { duration: 260, delay: i * 50, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' }).finished.catch(() => {}))).then(() => {
+      Promise.all(seen().map((sec, i) => sec.animate(W_OUT, { duration: T2, delay: i * STEP, easing: E_IO, fill: 'forwards' }).finished.catch(() => {}))).then(() => {
         if (id !== swapId) return;
         for (const sec of sections.values()) sec.getAnimations().forEach(a => a.cancel());
         refill();
-        seen().forEach((sec, i) => sec.animate(W_IN, { duration: 560, delay: i * 70, easing: 'cubic-bezier(.2,.7,.1,1)', fill: 'backwards' }));
+        seen().forEach((sec, i) => sec.animate(W_IN, { duration: T3, delay: i * STEP, easing: E_OUT, fill: 'backwards' }));
       });
     },
     relayout: () => layout(true),

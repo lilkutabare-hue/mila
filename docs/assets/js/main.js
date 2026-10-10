@@ -1,13 +1,13 @@
-import { createStrip } from './strip.js?v=cfca17ce';
-import { createWardrobe } from './wardrobe.js?v=cfca17ce';
-import { createViewer } from './viewer.js?v=cfca17ce';
-import { onRoute, navigate, back, parse } from './router.js?v=cfca17ce';
-import { shuffle, esc } from './media.js?v=cfca17ce';
+import { createStrip } from './strip.js?v=6c4a6f03';
+import { createWardrobe } from './wardrobe.js?v=6c4a6f03';
+import { createViewer } from './viewer.js?v=6c4a6f03';
+import { onRoute, navigate, back, parse } from './router.js?v=6c4a6f03';
+import { shuffle, esc, T2 } from './media.js?v=6c4a6f03';
 
 // When embedded elsewhere (Tilda T123), window.MH_BASE points at the hosted folder; everything loads from there.
 const BASE = (window.MH_BASE || new URL('../../', import.meta.url).href).replace(/\/?$/, '/');
 const abs = u => (u && !/^(https?:)?\/\//.test(u) ? BASE + u : u);
-import { MARKUP } from './markup.js?v=cfca17ce';
+import { MARKUP } from './markup.js?v=6c4a6f03';
 if (!document.getElementById('stage')) document.body.insertAdjacentHTML('beforeend', MARKUP);
 const manifest = await (await fetch(BASE + 'data/manifest.json', { cache: 'no-cache' })).json();
 const site = manifest.site || {};
@@ -135,11 +135,11 @@ function showLayer(which) {
   for (const [k, el] of Object.entries(layers)) {
     const on = k === which;
     if (on) { clearTimeout(el._t); if (el.hidden) { el.hidden = false; void el.offsetWidth; } el.classList.add('open'); }
-    else if (!el.hidden) { el.classList.remove('open'); clearTimeout(el._t); el._t = setTimeout(() => { el.hidden = true; }, 380); }
+    else if (!el.hidden) { el.classList.remove('open'); clearTimeout(el._t); el._t = setTimeout(() => { el.hidden = true; }, T2 + 40); }
   }
   // the strip under a shoot or contact blurs: promote it for the transition only
   const blurring = (which === 'project' || which === 'contact') !== (layerOpen === 'project' || layerOpen === 'contact');
-  if (blurring) { clearTimeout(stageFx); document.body.classList.add('stage-fx'); stageFx = setTimeout(() => document.body.classList.remove('stage-fx'), 560); }
+  if (blurring) { clearTimeout(stageFx); document.body.classList.add('stage-fx'); stageFx = setTimeout(() => document.body.classList.remove('stage-fx'), T2 + 120); }
   layerOpen = which;
   document.body.classList.toggle('layer-open', !!which);
   document.body.classList.toggle('project-open', which === 'project');

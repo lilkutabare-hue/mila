@@ -6,6 +6,9 @@
   --sai-t:env(safe-area-inset-top,0px); --sai-r:env(safe-area-inset-right,0px);
   --sai-b:env(safe-area-inset-bottom,0px); --sai-l:env(safe-area-inset-left,0px);
   --gutter:clamp(14px,2vw,28px);
+  /* motion: two curves, three durations; the same constants live in media.js for WAAPI. Only opacity and blur ever animate */
+  --e-out:cubic-bezier(.2,.7,.1,1); --e-io:cubic-bezier(.7,0,.2,1);
+  --t-1:180ms; --t-2:360ms; --t-3:600ms;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--paper);color:var(--ink);color-scheme:light}
@@ -21,24 +24,24 @@ img,video{display:block}
 @media (max-width:899px){ .nav{bottom:calc(12px + var(--sai-b)) !important} body.wardrobe-open .nav{bottom:0 !important} }
 .nav{position:fixed;left:0;right:0;bottom:calc(22px + var(--sai-b));z-index:40;display:flex;justify-content:center;align-items:center;gap:34px;font-size:11px;line-height:16px;letter-spacing:.02em;color:#fff;mix-blend-mode:difference;pointer-events:none}
 .nav a{pointer-events:auto;position:relative;padding:12px 8px;margin:-12px -8px}
-/* active link: it lands from a soft blur, then a band of light keeps sweeping through the word, as on a lock screen.
-   Over the strip the nav draws in difference, so the band is a darker grey that reads as light; over paper it is a light one */
-.nav{--glint:#474747}
-.nav a.on{background:linear-gradient(100deg,currentColor 0 37%,var(--glint) 50%,currentColor 63% 100%) 100% 0/300% 100% no-repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  animation:land .6s cubic-bezier(.2,.7,.1,1),glint 2.8s cubic-bezier(.45,0,.2,1) .35s infinite}
+/* active link: it lands from a soft blur, then a narrow band of light passes through the word once, and again every ~8 s.
+   Over the strip the nav draws in difference, so the band is a grey that reads as light; over paper it is a quieter grey */
+.nav{--glint:#6e6e6e}
+.nav a.on{background:linear-gradient(100deg,currentColor 0 44%,var(--glint) 50%,currentColor 56% 100%) 100% 0/300% 100% no-repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:land var(--t-3) var(--e-out),glint 8s var(--e-io) .35s infinite}
 @keyframes land{from{filter:blur(5px);opacity:.25}to{filter:blur(0);opacity:1}}
-@keyframes glint{0%{background-position:100% 0}50%,100%{background-position:0 0}}
+@keyframes glint{0%{background-position:100% 0}15%,100%{background-position:0 0}}
 @media (hover:hover){ .nav a:hover{opacity:.6} }
 @media (prefers-reduced-motion:reduce){ .nav a.on{animation:none;text-decoration:underline;text-underline-offset:3px} }
 /* wardrobe scrolls under the nav: the words sit in ink over the progressive blur of the layer (see .veil) */
-body.wardrobe-open .nav{--glint:#d3cfc7;bottom:0;padding:30px 0 calc(22px + var(--sai-b));mix-blend-mode:normal;color:var(--ink)}
+body.wardrobe-open .nav{--glint:#8a867e;bottom:0;padding:30px 0 calc(22px + var(--sai-b));mix-blend-mode:normal;color:var(--ink)}
 
 /* ===== roles: model / styling, two words at the top centre, mirroring the nav below ===== */
-.roles{position:fixed;left:0;right:0;top:calc(22px + var(--sai-t));z-index:40;display:flex;justify-content:center;align-items:center;gap:34px;font-size:11px;line-height:16px;letter-spacing:.02em;color:#fff;mix-blend-mode:difference;pointer-events:none;transition:opacity .2s}
-.roles a{pointer-events:auto;position:relative;padding:12px 8px;margin:-12px -8px;transition:opacity .3s}
-/* the picked word gets a hairline drawn in from the left; the other one steps back */
-.roles a::after{content:"";position:absolute;left:8px;right:8px;bottom:10px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right center;transition:transform .28s cubic-bezier(.7,0,.2,1)}
-.roles a.on::after{transform:scaleX(1);transform-origin:left center}
+.roles{position:fixed;left:0;right:0;top:calc(22px + var(--sai-t));z-index:40;display:flex;justify-content:center;align-items:center;gap:34px;font-size:11px;line-height:16px;letter-spacing:.02em;color:#fff;mix-blend-mode:difference;pointer-events:none;transition:opacity var(--t-1) var(--e-out)}
+.roles a{pointer-events:auto;position:relative;padding:12px 8px;margin:-12px -8px;transition:opacity var(--t-2) var(--e-out)}
+/* the picked word gets a hairline that fades in under it; the other one steps back */
+.roles a::after{content:"";position:absolute;left:8px;right:8px;bottom:10px;height:1px;background:currentColor;opacity:0;transition:opacity var(--t-2) var(--e-out)}
+.roles a.on::after{opacity:1}
 .roles.picked a:not(.on){opacity:.4}
 @media (hover:hover){ .roles a:hover{opacity:.6} .roles.picked a:not(.on):hover{opacity:.75} }
 @media (max-width:899px){ .roles{top:calc(14px + var(--sai-t))} }
@@ -60,29 +63,33 @@ body.wardrobe-open .roles{top:0;padding:calc(22px + var(--sai-t)) 0 30px;mix-ble
 .stage{position:fixed;inset:0;overflow:hidden;touch-action:pinch-zoom;cursor:grab;user-select:none;-webkit-user-select:none;z-index:1;background:var(--paper)}
 .stage.dragging{cursor:grabbing}
 .stage.static{cursor:default}
-#stage{transition:filter .5s cubic-bezier(.2,.7,.1,1),opacity .5s}
+#stage{transition:filter var(--t-2) var(--e-out),opacity var(--t-2) var(--e-out)}
 body.project-open #stage,body.contact-open #stage{filter:blur(8px);opacity:.55}
 body.stage-fx #stage{will-change:filter,opacity}   /* promoted only while the blur is in transition */
 .track{position:absolute;inset:0;will-change:transform}
 .pic{position:absolute;left:0;top:0;display:block;background:var(--paper);cursor:pointer;overflow:hidden;contain:strict}
 .pic.off{visibility:hidden}
-.pic img,.pic video{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s}
-.pic.loaded img,.pic.loaded video{opacity:1}
+.pic img,.pic video{width:100%;height:100%;object-fit:cover}
+/* every photo and teaser, in the strip, a shoot, the wardrobe and the viewer: the frame holds the photo's tone,
+   then the image resolves out of a soft blur. One class, one timing */
+.media{opacity:0;filter:blur(6px);transition:opacity var(--t-2) var(--e-out),filter var(--t-2) var(--e-out)}
+.media.in{opacity:1;filter:none}
 .project .stage{position:absolute}
-.p-title{position:absolute;left:50%;top:calc(30px + var(--sai-t));z-index:2;margin:0;padding:10px 12px;transform:translate(-50%,4px);max-width:calc(100% - 48px);
-  font:14px/1.3 var(--sans);text-transform:lowercase;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  opacity:0;transition:opacity .5s .25s,transform .5s .25s cubic-bezier(.2,.7,.1,1)}
-.p-title{cursor:pointer;text-decoration:none}
-.p-title::after{content:"";position:absolute;left:12px;right:12px;bottom:7px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right center;transition:transform .28s cubic-bezier(.7,0,.2,1)}
-.p-title.linked::after{transform:scaleX(1);transform-origin:left center;opacity:.35}
-@media (hover:hover){ .p-title:hover::after{transform:scaleX(1);transform-origin:left center} }
-.layer.open .p-title{opacity:1;transform:translate(-50%,0)}
+.p-title{position:absolute;left:50%;top:calc(30px + var(--sai-t));z-index:2;margin:0;padding:10px 12px;transform:translateX(-50%);max-width:calc(100% - 48px);
+  font:14px/1.3 var(--sans);text-transform:lowercase;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;text-decoration:none}
+.p-title::after{content:"";position:absolute;left:12px;right:12px;bottom:7px;height:1px;background:currentColor;opacity:0;transition:opacity var(--t-2) var(--e-out)}
+.p-title.linked::after{opacity:.35}
+@media (hover:hover){ .p-title:hover::after{opacity:1} }
 .project .stage{cursor:default}
 
 /* ===== layers ===== */
-.layer{position:fixed;inset:0;z-index:15;background:var(--paper);transform:translateY(100%);transition:transform .36s cubic-bezier(.2,.7,.1,1);overflow:hidden}
+/* a shoot or the wardrobe does not slide in: the layer fades up over the blurred strip while its content resolves out of a blur.
+   closing is the same dissolve in reverse */
+.layer{position:fixed;inset:0;z-index:15;background:var(--paper);opacity:0;transition:opacity var(--t-2) var(--e-out);overflow:hidden}
 .project{background:rgba(242,240,235,.8)}
-.layer.open{transform:translateY(0)}
+.layer.open{opacity:1}
+.layer>.scroll,.layer>.stage,.layer>.p-title{filter:blur(6px);transition:filter var(--t-2) var(--e-out)}
+.layer.open>.scroll,.layer.open>.stage,.layer.open>.p-title{filter:none}
 .layer .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
   padding:calc(28px + var(--sai-t)) calc(var(--gutter) + var(--sai-r)) calc(96px + var(--sai-b)) calc(var(--gutter) + var(--sai-l))}
 
@@ -92,8 +99,7 @@ body.stage-fx #stage{will-change:filter,opacity}   /* promoted only while the bl
 .rows{display:flex;flex-direction:column;gap:4px}
 .row{display:flex;gap:4px}
 .tile{position:relative;background:var(--ghost);overflow:hidden;cursor:pointer;flex:none}
-.tile img,.tile video{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s}
-.tile.loaded img,.tile.loaded video{opacity:1}
+.tile img,.tile video{width:100%;height:100%;object-fit:cover}
 .empty{color:var(--muted);padding:20px 0}
 /* progressive blur at the top and bottom edges of the wardrobe, as on a lock screen: four backdrop layers,
    each masked to start further toward the edge, so the photos under the words dissolve by degrees; over them the faintest paper veil
@@ -111,8 +117,10 @@ body.stage-fx #stage{will-change:filter,opacity}   /* promoted only while the bl
 .veil::after{background:linear-gradient(var(--dir),rgba(242,240,235,.55) 0%,rgba(242,240,235,.46) 18%,rgba(242,240,235,.34) 36%,rgba(242,240,235,.21) 54%,rgba(242,240,235,.1) 72%,rgba(242,240,235,.03) 88%,rgba(242,240,235,0) 100%)}
 
 /* contact: translucent paper over the strip, centred text */
-.contact{position:fixed;inset:0;z-index:20;background:rgba(242,240,235,.72);display:flex;align-items:center;justify-content:center;text-align:center;opacity:0;transition:opacity .25s;cursor:default}
+.contact{position:fixed;inset:0;z-index:20;background:rgba(242,240,235,.72);display:flex;align-items:center;justify-content:center;text-align:center;opacity:0;transition:opacity var(--t-2) var(--e-out);cursor:default}
 .contact.open{opacity:1}
+.contact .info{filter:blur(6px);transition:filter var(--t-2) var(--e-out)}
+.contact.open .info{filter:none}
 .contact .info{padding:0 24px calc(60px + var(--sai-b))}
 .contact{-webkit-font-smoothing:auto;color:#000}
 .contact h1{font:18px/1.15 var(--sans);text-transform:none;margin:0 0 5px;letter-spacing:-.01em}
@@ -123,14 +131,13 @@ body.stage-fx #stage{will-change:filter,opacity}   /* promoted only while the bl
 .contact a:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* ===== viewer (single work, from wardrobe or a shoot) ===== */
-.viewer{position:fixed;inset:0;z-index:30;background:var(--paper);display:flex;flex-direction:column;opacity:0;transition:opacity .2s}
+.viewer{position:fixed;inset:0;z-index:30;background:var(--paper);display:flex;flex-direction:column;opacity:0;transition:opacity var(--t-2) var(--e-out)}
 .viewer.open{opacity:1}
 .viewer.fading{opacity:0}
 .v-stage{position:absolute;inset:0;padding:calc(56px + var(--sai-t)) 48px calc(64px + var(--sai-b));display:flex;align-items:center;justify-content:center;touch-action:pinch-zoom}
-.v-media{position:relative;background:var(--ghost);overflow:hidden;will-change:transform;transform-origin:0 0}
+.v-media{position:relative;background:var(--ghost);overflow:hidden}
 .v-media img,.v-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.v-media img.hq{opacity:0;transition:opacity .25s}
-.v-media img.hq.ready{opacity:1}
+.v-media img.hq{z-index:1}
 .v-media video{background:#000}
 .v-top{position:absolute;top:0;left:0;right:0;z-index:2;display:flex;justify-content:space-between;padding:calc(14px + var(--sai-t)) calc(var(--gutter) + var(--sai-r)) 12px calc(var(--gutter) + var(--sai-l));font-size:14px;pointer-events:none}
 .v-top>*{pointer-events:auto}
@@ -151,12 +158,12 @@ body.stage-fx #stage{will-change:filter,opacity}   /* promoted only while the bl
 .v-ctl button{color:inherit}
 @media (max-width:899px){ .v-stage{padding:calc(52px + var(--sai-t)) 12px calc(64px + var(--sai-b))} }
 
-@media (prefers-reduced-motion:reduce){ .layer{transition:none} }
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{transition-duration:0s !important;animation-duration:0s !important} }
 
 /* year of a shoot: quiet, right after its name */
 .yr{color:var(--muted);margin-left:.6em;font-variant-numeric:tabular-nums}
 
 /* single-frame viewer has its own close and caption: the site nav steps aside so nothing overlaps */
-.nav{transition:opacity .2s}
+.nav{transition:opacity var(--t-1) var(--e-out)}
 body.viewer-open .nav{opacity:0;pointer-events:none}
 .v-bottom{padding-bottom:calc(20px + var(--sai-b))}

@@ -1,6 +1,6 @@
 // Strip: photos packed into columns that fill the whole viewport, infinite horizontal scroll.
 // One transform per frame on the track; nodes keep static left/top and only hop by loopW when they wrap.
-import { pickTier, preloadImage, REDUCED } from './media.js?v=cfca17ce';
+import { pickTier, preloadImage, REDUCED, E_OUT, E_IO, T2, T3 } from './media.js?v=6c4a6f03';
 
 export function createStrip({ items, stage, loop = true, loopIfWide = false, layout = 'scatter', swipeDown = false, maxTier = 'full', onOpen }) {
   let looping = loop;                      // a band loops too once it is wider than the screen
@@ -139,10 +139,10 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     if (node.loaded) return; node.loaded = true;
     const { item } = node;
     if (item.type === 'photo') {
-      const img = new Image(); img.decoding = 'async'; img.alt = '';
+      const img = new Image(); img.decoding = 'async'; img.alt = ''; img.className = 'media';
       let settled = false; const settle = () => { if (!settled) { settled = true; pending--; } };
       pending++;
-      img.onload = () => { settle(); node.el.classList.add('loaded'); };
+      img.onload = () => img.decode().catch(() => {}).then(() => { settle(); node.el.classList.add('loaded'); img.classList.add('in'); });
       img.onerror = () => { settle(); fail(node); };
       let tier = pickTier(item, node.w, node.h);
       if (tier === 'full' && maxTier !== 'full') tier = 'rail';     // the collage never needs 2560px frames
@@ -152,12 +152,13 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
       if (tier === 'full') { if (background) node.needFull = true; else upgrade(node); }
     } else {
       const v = document.createElement('video');
-      v.muted = true; v.playsInline = true; v.loop = true; v.preload = 'none';
+      v.muted = true; v.playsInline = true; v.loop = true; v.preload = 'none'; v.className = 'media';
       v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
       const small = item.small && pickTier(item, node.w, node.h) === 'small';
       v.poster = item.poster.rail; v.src = (small ? item.small : item.rail).src;
       v.addEventListener('error', () => fail(node));
       node.el.classList.add('loaded'); node.el.appendChild(v); node.media = v;
+      requestAnimationFrame(() => v.classList.add('in'));
     }
   }
   function fail(node) {
@@ -265,7 +266,7 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     const { moved, hit, axis, sy } = ptr; ptr = null; stage.classList.remove('dragging'); run();
     suppressClick = true; setTimeout(() => { suppressClick = false; }, 0);
     if (swipeDown && axis === 'y') {
-      if (e.type === 'pointerup' && e.clientY - sy > 90) { stage.dispatchEvent(new CustomEvent('swipedown')); setTimeout(() => { dragY = dragYTarget = 0; }, 400); }
+      if (e.type === 'pointerup' && e.clientY - sy > 90) { stage.dispatchEvent(new CustomEvent('swipedown')); setTimeout(() => { dragY = dragYTarget = 0; run(); }, T2 + 40); }
       else dragYTarget = 0;
       return;
     }
@@ -306,11 +307,11 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
   function setItems(list) { live = list.slice(); for (const n of nodes) n.el.remove(); for (const [, n] of base) n.el.remove(); track.replaceChildren(); base = new Map(); nodes = []; if (active) { build(null); run(); } }
 
   // ---------- swap: a new set of frames ----------
-  // the frames on screen lift and turn away like riffled cards, blurring out one after another;
-  // the new set lands the same way, once its first screen has decoded
-  const LIFT = 'perspective(1200px) translateY(-2vh) scale(1.03)';
-  const OUT = [{ transform: LIFT + ' rotateY(-14deg)', filter: 'blur(10px)', opacity: 0 }];
-  const IN = [{ transform: LIFT + ' rotateY(14deg)', filter: 'blur(12px)', opacity: 0 }, { transform: 'perspective(1200px) translateY(0) scale(1) rotateY(0deg)', filter: 'blur(0px)', opacity: 1 }];
+  // the frames on screen dissolve into a soft blur, left to right in a barely readable wave;
+  // the new set resolves the same way once its first screen has decoded. Nothing moves
+  const OUT = [{ opacity: 0, filter: 'blur(8px)' }];
+  const IN = [{ opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)' }];
+  const STEP = 30;                          // ms between neighbours
   let swapId = 0;
   const onScreen = () => nodes.filter(n => n.visible).sort((a, b) => a.el.getBoundingClientRect().left - b.el.getBoundingClientRect().left);
   async function swap(list) {
@@ -319,8 +320,8 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
     // the first screen of the new set starts loading while the old one leaves (tier guessed from the usual frame height)
     const tall = vw < 700 ? 0.25 : 0.6, guess = vh * tall * (devicePixelRatio || 1) <= 600 ? 'small' : 'rail';
     for (const i of list.slice(0, 6)) if (i.type === 'photo' && i[guess]) preloadImage(i[guess].src).catch(() => {});
-    const out = onScreen(), step = Math.min(40, 150 / Math.max(1, out.length));
-    await Promise.all(out.map((n, i) => n.el.animate(OUT, { duration: 300, delay: i * step, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' }).finished.catch(() => {})));
+    const out = onScreen();
+    await Promise.all(out.map((n, i) => n.el.animate(OUT, { duration: T2, delay: i * STEP, easing: E_IO, fill: 'forwards' }).finished.catch(() => {})));
     if (id !== swapId) return;
     stage.classList.add('arriving'); setItems(list);
     const t0 = performance.now();
@@ -330,8 +331,8 @@ export function createStrip({ items, stage, loop = true, loopIfWide = false, lay
       requestAnimationFrame(check);
     });
     if (id !== swapId) return;
-    const inn = onScreen(), step2 = Math.min(55, 240 / Math.max(1, inn.length));
-    inn.forEach((n, i) => n.el.animate(IN, { duration: 600, delay: i * step2, easing: 'cubic-bezier(.2,.7,.1,1)', fill: 'backwards' }));
+    const inn = onScreen();
+    inn.forEach((n, i) => n.el.animate(IN, { duration: T3, delay: i * STEP, easing: E_OUT, fill: 'backwards' }));
     stage.classList.remove('arriving');
   }
 
