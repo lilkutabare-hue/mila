@@ -28,8 +28,7 @@ img,video{display:block}
    Over the strip the nav draws in difference, so the band is a grey that reads as light; over paper it is a quieter grey */
 .nav{--glint:#6e6e6e}
 .nav a.on{background:linear-gradient(100deg,currentColor 0 44%,var(--glint) 50%,currentColor 56% 100%) 100% 0/300% 100% no-repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  animation:land var(--t-3) var(--e-out),glint 8s var(--e-io) .35s infinite}
-@keyframes land{from{filter:blur(5px);opacity:.25}to{filter:blur(0);opacity:1}}
+  animation:glint 8s var(--e-io) .35s infinite}
 @keyframes glint{0%{background-position:100% 0}15%,100%{background-position:0 0}}
 @media (hover:hover){ .nav a:hover{opacity:.6} }
 @media (prefers-reduced-motion:reduce){ .nav a.on{animation:none;text-decoration:underline;text-underline-offset:3px} }
@@ -59,9 +58,8 @@ body.project-open .roles a,body.contact-open .roles a,body.viewer-open .roles a{
 .stage{position:fixed;inset:0;overflow:hidden;touch-action:pinch-zoom;cursor:grab;user-select:none;-webkit-user-select:none;z-index:1;background:var(--paper)}
 .stage.dragging{cursor:grabbing}
 .stage.static{cursor:default}
-#stage{transition:filter var(--t-2) var(--e-out),opacity var(--t-2) var(--e-out)}
+#stage{will-change:filter,opacity;transition:filter var(--t-3) var(--e-out),opacity var(--t-3) var(--e-out)}
 body.project-open #stage,body.contact-open #stage{filter:blur(8px);opacity:.55}
-body.stage-fx #stage{will-change:filter,opacity}   /* promoted only while the blur is in transition */
 .track{position:absolute;inset:0;will-change:transform}
 .pic{position:absolute;left:0;top:0;display:block;background:var(--paper);cursor:pointer;overflow:hidden;contain:strict}
 .pic.off{visibility:hidden}
@@ -79,13 +77,12 @@ body.stage-fx #stage{will-change:filter,opacity}   /* promoted only while the bl
 .project .stage{cursor:default}
 
 /* ===== layers ===== */
-/* a shoot or the wardrobe does not slide in: the layer fades up over the blurred strip while its content resolves out of a blur.
-   closing is the same dissolve in reverse */
-.layer{position:fixed;inset:0;z-index:15;background:var(--paper);opacity:0;transition:opacity var(--t-2) var(--e-out);overflow:hidden}
+/* a shoot or the gallery does not slide in: the layer dissolves up over the blurred strip, and dissolves away the same way.
+   A closed layer is invisible, not display:none, so its layout is already done when it is asked for and the fade starts clean */
+.layer{position:fixed;inset:0;z-index:15;background:var(--paper);opacity:0;visibility:hidden;overflow:hidden;
+  transition:opacity var(--t-3) var(--e-out),visibility 0s linear var(--t-3)}
 .project{background:rgba(242,240,235,.8)}
-.layer.open{opacity:1}
-.layer>.scroll,.layer>.stage,.layer>.p-title{filter:blur(6px);transition:filter var(--t-2) var(--e-out)}
-.layer.open>.scroll,.layer.open>.stage,.layer.open>.p-title{filter:none}
+.layer.open{opacity:1;visibility:visible;transition:opacity var(--t-3) var(--e-out),visibility 0s}
 .layer .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
   padding:calc(28px + var(--sai-t)) calc(var(--gutter) + var(--sai-r)) calc(96px + var(--sai-b)) calc(var(--gutter) + var(--sai-l))}
 
@@ -109,9 +106,10 @@ body.stage-fx #stage{will-change:filter,opacity}   /* promoted only while the bl
 @media (max-width:899px){ .veil.top{height:calc(72px + var(--sai-t));--solid:calc(36px + var(--sai-t))} .veil.bottom{height:calc(84px + var(--sai-b));--solid:calc(36px + var(--sai-b))} }
 
 /* contact: translucent paper over the strip, centred text */
-.contact{position:fixed;inset:0;z-index:20;background:rgba(242,240,235,.72);display:flex;align-items:center;justify-content:center;text-align:center;opacity:0;transition:opacity var(--t-2) var(--e-out);cursor:default}
-.contact.open{opacity:1}
-.contact .info{filter:blur(6px);transition:filter var(--t-2) var(--e-out)}
+.contact{position:fixed;inset:0;z-index:20;background:rgba(242,240,235,.72);display:flex;align-items:center;justify-content:center;text-align:center;opacity:0;visibility:hidden;cursor:default;
+  transition:opacity var(--t-3) var(--e-out),visibility 0s linear var(--t-3)}
+.contact.open{opacity:1;visibility:visible;transition:opacity var(--t-3) var(--e-out),visibility 0s}
+.contact .info{filter:blur(6px);transition:filter var(--t-3) var(--e-out)}
 .contact.open .info{filter:none}
 .contact .info{padding:0 24px calc(60px + var(--sai-b))}
 .contact{-webkit-font-smoothing:auto;color:#000}

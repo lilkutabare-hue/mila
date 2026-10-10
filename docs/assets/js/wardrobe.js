@@ -1,5 +1,5 @@
 // Wardrobe: every work, by project, justified rows, lazy HQ loading. With a role picked, only that side of the work.
-import { pickTier, esc, REDUCED, E_OUT, E_IO, T2, T3 } from './media.js?v=21fb2bf1';
+import { pickTier, esc, REDUCED, E_OUT, E_IO, T2, T3 } from './media.js?v=f0c02ca2';
 
 export function createWardrobe({ el, projects, role = null, onOpen }) {
   const scroll = el.querySelector('.scroll');
@@ -67,7 +67,7 @@ export function createWardrobe({ el, projects, role = null, onOpen }) {
   // ---- lazy loading
   const io = new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) { load(tiles.get(e.target.dataset.id)); io.unobserve(e.target); } }, { root: scroll, rootMargin: '600px 0px' });
   const vio = new IntersectionObserver(es => { for (const e of es) { const v = e.target.querySelector('video'); if (!v) continue; if (e.intersectionRatio >= 0.5) v.play().catch(() => {}); else v.pause(); } }, { root: scroll, threshold: [0, 0.5, 1] });
-  function observeAll() { for (const t of tiles.values()) if (!t.loaded && t.el.isConnected) io.observe(t.el); }
+  function observeAll() { if (!open) return; for (const t of tiles.values()) if (!t.loaded && t.el.isConnected) io.observe(t.el); }
   function load(t) {
     if (t.loaded) return; t.loaded = true;
     const { item } = t;
@@ -99,8 +99,13 @@ export function createWardrobe({ el, projects, role = null, onOpen }) {
 
   return {
     get isOpen() { return open; },
+    prepare() {   // layout while still invisible, and the first screen's frames fetched, so opening is only a fade onto a filled page
+      if (!open && (!sectionsEl.childElementCount || dirty)) render();
+      if (open) return;
+      for (const t of tiles.values()) if (!t.loaded && t.el.isConnected && t.el.getBoundingClientRect().top < innerHeight * 1.3) load(t);
+    },
     open(slug) {
-      if (!open) { open = true; if (!sectionsEl.childElementCount || dirty) render(); else layout(false); }
+      if (!open) { open = true; if (!sectionsEl.childElementCount || dirty) render(); else { layout(false); observeAll(); } }
       if (slug && sections.has(slug)) {
         layout(false); sections.get(slug).scrollIntoView({ block: 'start' });
       }

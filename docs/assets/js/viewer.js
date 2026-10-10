@@ -1,5 +1,5 @@
 // Full-screen viewer: a look taken off the hanger.
-import { pickTier, preloadImage, fmtTime, pad3, esc, REDUCED, E_OUT, T1, T2 } from './media.js?v=21fb2bf1';
+import { pickTier, preloadImage, fmtTime, pad3, esc, REDUCED, E_OUT, T1, T2 } from './media.js?v=f0c02ca2';
 
 export function createViewer({ el, setTaken, centerRail, isOnRail, onNavigate, onClose }) {
   const settle = (anim, ms) => Promise.race([anim.finished.catch(() => {}), new Promise(r => setTimeout(r, ms))]);
