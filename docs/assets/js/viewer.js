@@ -1,5 +1,5 @@
 // Full-screen viewer: a look taken off the hanger.
-import { pickTier, preloadImage, fmtTime, pad3, esc, REDUCED, E_OUT, T1, T2 } from './media.js?v=6c4a6f03';
+import { pickTier, preloadImage, fmtTime, pad3, esc, REDUCED, E_OUT, T1, T2 } from './media.js?v=21fb2bf1';
 
 export function createViewer({ el, setTaken, centerRail, isOnRail, onNavigate, onClose }) {
   const settle = (anim, ms) => Promise.race([anim.finished.catch(() => {}), new Promise(r => setTimeout(r, ms))]);
@@ -56,17 +56,13 @@ export function createViewer({ el, setTaken, centerRail, isOnRail, onNavigate, o
     return { box: b, fit };
   }
   function caption(item) {
+    // the shoot's name; when the brand or person has a page, the name is the way there
     const p = item.projectObj, i = idx();
     countEl.textContent = `${pad3(i + 1)} / ${pad3(list.length)}`;
-    const parts = [`<span class="proj">${esc(p.title)}</span>`];
+    const name = p.link ? `<a class="proj" href="${esc(p.link)}" target="_blank" rel="noopener">${esc(p.title)}</a>` : `<span class="proj">${esc(p.title)}</span>`;
+    const parts = [name];
     if (p.credits) parts.push(`<span class="proj">${esc(p.credits)}</span>`);
-    parts.push(`<button type="button" id="v-copy">copy link</button>`);
     bottom.innerHTML = parts.join(' ');
-    bottom.querySelector('#v-copy').addEventListener('click', async e => {
-      const url = location.origin + location.pathname + '#/look/' + item.id;
-      try { await navigator.clipboard.writeText(url); e.target.textContent = 'copied'; } catch { prompt('link', url); }
-      setTimeout(() => { e.target.textContent = 'copy link'; }, 1600);
-    });
   }
   function preloadNeighbours() {
     const i = idx();

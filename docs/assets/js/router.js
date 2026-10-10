@@ -1,9 +1,9 @@
-// Hash router: '' | #/model | #/styling | #/wardrobe | #/wardrobe/<slug> | #/look/<id> | #/contact
+// Hash router: '' | #/model | #/styling | #/gallery | #/gallery/<slug> | #/look/<id> | #/contact  (#/wardrobe still opens the gallery: old links)
 export function parse(hash = location.hash) {
   const h = decodeURIComponent(hash).replace(/^#\/?/, '').replace(/\/+$/, '');
   if (!h) return { name: 'rail' };
   const [a, b] = h.split('/');
-  if (a === 'wardrobe') return { name: 'wardrobe', slug: b || null };
+  if (a === 'gallery' || a === 'wardrobe') return { name: 'wardrobe', slug: b || null };
   if (a === 'look' && b) return { name: 'look', id: b };
   if (a === 'contact') return { name: 'contact' };
   if (a === 'model' || a === 'styling') return { name: 'role', role: a };

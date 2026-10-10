@@ -7,12 +7,12 @@ export const MARKUP = `<div class="mh-bg" aria-hidden="true"></div>
   <div class="stage strip" id="project-stage"><div class="track"></div></div>
 </section>
 
-<section id="wardrobe" class="layer wardrobe" aria-label="wardrobe" hidden>
+<section id="wardrobe" class="layer wardrobe" aria-label="gallery" hidden>
   <div class="scroll">
     <div id="sections"></div>
   </div>
-  <div class="veil top" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-  <div class="veil bottom" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="veil top" aria-hidden="true"></div>
+  <div class="veil bottom" aria-hidden="true"></div>
 </section>
 
 <section id="contact" class="contact" aria-label="contact" hidden>
@@ -21,7 +21,7 @@ export const MARKUP = `<div class="mh-bg" aria-hidden="true"></div>
 
 <nav class="nav" aria-label="site">
   <a href="#/contact" id="nav-contact">contact</a>
-  <a href="#/wardrobe" id="nav-gallery">wardrobe</a>
+  <a href="#/gallery" id="nav-gallery">gallery</a>
 </nav>
 <nav class="roles" aria-label="work">
   <a href="#/model" id="nav-model">modeling</a>

@@ -1,13 +1,13 @@
-import { createStrip } from './strip.js?v=6c4a6f03';
-import { createWardrobe } from './wardrobe.js?v=6c4a6f03';
-import { createViewer } from './viewer.js?v=6c4a6f03';
-import { onRoute, navigate, back, parse } from './router.js?v=6c4a6f03';
-import { shuffle, esc, T2 } from './media.js?v=6c4a6f03';
+import { createStrip } from './strip.js?v=21fb2bf1';
+import { createWardrobe } from './wardrobe.js?v=21fb2bf1';
+import { createViewer } from './viewer.js?v=21fb2bf1';
+import { onRoute, navigate, back, parse } from './router.js?v=21fb2bf1';
+import { shuffle, esc, T2 } from './media.js?v=21fb2bf1';
 
 // When embedded elsewhere (Tilda T123), window.MH_BASE points at the hosted folder; everything loads from there.
 const BASE = (window.MH_BASE || new URL('../../', import.meta.url).href).replace(/\/?$/, '/');
 const abs = u => (u && !/^(https?:)?\/\//.test(u) ? BASE + u : u);
-import { MARKUP } from './markup.js?v=6c4a6f03';
+import { MARKUP } from './markup.js?v=21fb2bf1';
 if (!document.getElementById('stage')) document.body.insertAdjacentHTML('beforeend', MARKUP);
 const manifest = await (await fetch(BASE + 'data/manifest.json', { cache: 'no-cache' })).json();
 const site = manifest.site || {};
@@ -74,7 +74,7 @@ function selectionFor(r) {
 // ---- chrome
 const $ = s => document.querySelector(s);
 const navGallery = $('#nav-gallery'), navContact = $('#nav-contact');
-const labelGallery = site.labels?.gallery || 'wardrobe', labelContact = site.labels?.contact || 'contact';
+const labelGallery = site.labels?.gallery || 'gallery', labelContact = site.labels?.contact || 'contact';
 navGallery.textContent = labelGallery; navContact.textContent = labelContact;
 const tidy = s => (s && /^TODO/i.test(s)) ? s.replace(/^TODO:?\s*/i, '') : (s || '');
 const role = tidy(site.role);
@@ -94,11 +94,13 @@ const contactEl = $('#contact');
 // ---- strips
 const strip = createStrip({ items: selectionFor(picked), stage: $('#stage'), loop: true, layout: 'scatter', maxTier: innerWidth >= 1100 ? 'full' : 'rail', onOpen: item => navigate(`p/${item.projectObj.slug}`) });
 const projectStrip = createStrip({ items: [], stage: $('#project-stage'), loop: false, loopIfWide: true, layout: 'band', swipeDown: true, onOpen: item => navigate(`look/${item.id}`) });
-const wardrobe = createWardrobe({ el: $('#wardrobe'), projects: visit, role: picked, onOpen: item => navigate(`look/${item.id}`) });
+// wardrobe reads top to bottom from the oldest shoot to the newest; shoots without a year come first, in their folder order
+const byYear = manifest.projects.slice().sort((a, b) => (Number(a.year) || 0) - (Number(b.year) || 0));
+const wardrobe = createWardrobe({ el: $('#wardrobe'), projects: byYear, role: picked, onOpen: item => navigate(`look/${item.id}`) });
 const viewer = createViewer({
   el: $('#viewer'), railRectOf: () => null, setTaken: () => {}, centerRail: () => {}, isOnRail: () => false,
   onNavigate: item => navigate(`look/${item.id}`, { replace: true }),
-  onClose: () => back(layerOpen === 'wardrobe' ? 'wardrobe' : layerOpen === 'project' ? `p/${currentProject?.slug}` : home()),
+  onClose: () => back(layerOpen === 'wardrobe' ? 'gallery' : layerOpen === 'project' ? `p/${currentProject?.slug}` : home()),
 });
 
 // ---- model / styling: tap a word to see only that side of the work, tap it again for everything
@@ -128,7 +130,7 @@ let layerOpen = null, currentProject = null, currentItems = [], currentKey = '',
 const layers = { project: $('#project'), wardrobe: $('#wardrobe'), contact: contactEl };
 // the open word leads back to the strip, filtered as it was
 function paintNav() {
-  navGallery.setAttribute('href', layerOpen === 'wardrobe' ? '#/' + home() : '#/wardrobe');
+  navGallery.setAttribute('href', layerOpen === 'wardrobe' ? '#/' + home() : '#/gallery');
   navContact.setAttribute('href', layerOpen === 'contact' ? '#/' + home() : '#/contact');
 }
 function showLayer(which) {

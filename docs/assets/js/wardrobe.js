@@ -1,5 +1,5 @@
 // Wardrobe: every work, by project, justified rows, lazy HQ loading. With a role picked, only that side of the work.
-import { pickTier, esc, REDUCED, E_OUT, E_IO, T2, T3 } from './media.js?v=6c4a6f03';
+import { pickTier, esc, REDUCED, E_OUT, E_IO, T2, T3 } from './media.js?v=21fb2bf1';
 
 export function createWardrobe({ el, projects, role = null, onOpen }) {
   const scroll = el.querySelector('.scroll');
@@ -33,7 +33,7 @@ export function createWardrobe({ el, projects, role = null, onOpen }) {
   function layout(force) {
     const W = sectionsEl.clientWidth; if (!W || (!force && W === builtWidth)) return;
     builtWidth = W;
-    const phone = innerWidth < 900, targetH = phone ? 180 : 320, gap = 8;
+    const phone = innerWidth < 900, targetH = phone ? 124 : 320, gap = phone ? 3 : 4;   // phone: three or four frames to a row; gap as in .row
     for (const p of shown()) {
       const rowsEl = sections.get(p.slug).querySelector('.rows');
       const rows = []; let row = [], sumAR = 0;
