@@ -148,5 +148,6 @@ body.project-open #stage,body.contact-open #stage{filter:blur(8px);opacity:.55}
 
 /* single-frame viewer has its own close and caption: the site nav steps aside so nothing overlaps */
 .nav{transition:opacity var(--t-1) var(--e-out)}
-body.viewer-open .nav{opacity:0;pointer-events:none}
+body.viewer-open .nav{opacity:0;pointer-events:none;visibility:hidden;transition:opacity var(--t-1) var(--e-out),visibility 0s linear var(--t-1)}
+body.viewer-open .nav a{pointer-events:none}   /* the links keep their own pointer-events, so they are switched off here too */
 .v-bottom{padding-bottom:calc(20px + var(--sai-b))}
