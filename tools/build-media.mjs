@@ -286,25 +286,21 @@ async function buildBrandFromSeal(sealPath, site) {
     .jpeg({ quality: 88 }).toFile(join(PUB, 'og.jpg'));
 }
 
-// ---------- favicon, touch icon and og image from content/brand/icon.png (a square, flat mark) ----------
+// ---------- favicon, touch icon and og image from content/brand/icon.png (a transparent round mark, as GitHub's) ----------
 async function findIcon() { const p = join(CONTENT, 'brand', 'icon.png'); return existsSync(p) ? p : null; }
 async function buildBrandFromIcon(iconPath) {
-  // small sizes keep the square but round its corners like an app icon, so it sits well in a light or dark tab
-  const rounded = async n => {
-    const r = Math.round(n * 0.22);
-    const mask = Buffer.from(`<svg width="${n}" height="${n}"><rect width="${n}" height="${n}" rx="${r}" ry="${r}" fill="#fff"/></svg>`);
-    return sharp(iconPath).resize(n, n, { kernel: 'lanczos3' }).composite([{ input: mask, blend: 'dest-in' }]).png().toBuffer();
-  };
-  await writeFile(join(PUB, 'favicon.png'), await rounded(64));
-  const sizes = [16, 32, 48], pngs = []; for (const n of sizes) pngs.push(await rounded(n));
+  const at = n => sharp(iconPath).resize(n, n, { kernel: 'lanczos3' }).png().toBuffer();   // the mark itself, transparent around the disc
+  await writeFile(join(PUB, 'favicon.png'), await at(64));
+  const sizes = [16, 32, 48], pngs = []; for (const n of sizes) pngs.push(await at(n));
   const head = Buffer.alloc(6 + 16 * sizes.length); head.writeUInt16LE(0, 0); head.writeUInt16LE(1, 2); head.writeUInt16LE(sizes.length, 4);
   let off = head.length;
   sizes.forEach((n, i) => { const e = 6 + 16 * i; head.writeUInt8(n, e); head.writeUInt8(n, e + 1); head.writeUInt8(0, e + 2); head.writeUInt8(0, e + 3); head.writeUInt16LE(1, e + 4); head.writeUInt16LE(32, e + 6); head.writeUInt32LE(pngs[i].length, e + 8); head.writeUInt32LE(off, e + 12); off += pngs[i].length; });
   await writeFile(join(PUB, 'favicon.ico'), Buffer.concat([head, ...pngs]));
-  await sharp(iconPath).resize(180, 180, { kernel: 'lanczos3' }).png().toFile(join(PUB, 'apple-touch-icon.png'));   // iOS rounds it itself
-  const W = 1200, H = 630, S = 470;
+  // iOS needs an opaque square: the mark on white with air around it
+  await sharp({ create: { width: 180, height: 180, channels: 3, background: '#FFFFFF' } }).composite([{ input: await at(140), gravity: 'centre' }]).png().toFile(join(PUB, 'apple-touch-icon.png'));
+  const W = 1200, H = 630, S = 420;
   await sharp({ create: { width: W, height: H, channels: 3, background: '#FFFFFF' } })
-    .composite([{ input: await rounded(S), left: Math.round((W - S) / 2), top: Math.round((H - S) / 2) }])
+    .composite([{ input: await at(S), left: Math.round((W - S) / 2), top: Math.round((H - S) / 2) }])
     .jpeg({ quality: 88 }).toFile(join(PUB, 'og.jpg'));
 }
 
