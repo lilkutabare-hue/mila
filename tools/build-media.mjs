@@ -204,14 +204,14 @@ async function buildBranding(firstFrames, site) {
     parts.push({ input: buf, left: colW * i, top: 0 });
   }
   const label = Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-    <rect x="40" y="${H - 110}" width="${W - 80}" height="70" rx="2" fill="#F2F0EB" fill-opacity="0.94"/>
-    <text x="64" y="${H - 62}" font-family="Instrument Serif, Georgia, 'Times New Roman', serif" font-style="italic" font-size="44" fill="#141414">${site.name}</text>
-    <text x="${W - 64}" y="${H - 66}" text-anchor="end" font-family="IBM Plex Mono, Menlo, monospace" font-size="18" letter-spacing="1.2" fill="#8A867E">INSTAGRAM @${site.instagram.toUpperCase()}</text>
+    <rect x="40" y="${H - 110}" width="${W - 80}" height="70" rx="2" fill="#FFFFFF" fill-opacity="0.94"/>
+    <text x="64" y="${H - 62}" font-family="Instrument Serif, Georgia, 'Times New Roman', serif" font-style="italic" font-size="44" fill="#000000">${site.name}</text>
+    <text x="${W - 64}" y="${H - 66}" text-anchor="end" font-family="IBM Plex Mono, Menlo, monospace" font-size="18" letter-spacing="1.2" fill="#8C8C8C">INSTAGRAM @${site.instagram.toUpperCase()}</text>
   </svg>`);
-  await sharp({ create: { width: W, height: H, channels: 3, background: '#F2F0EB' } }).composite([...parts, { input: label, left: 0, top: 0 }]).jpeg({ quality: 86 }).toFile(join(PUB, 'og.jpg'));
+  await sharp({ create: { width: W, height: H, channels: 3, background: '#FFFFFF' } }).composite([...parts, { input: label, left: 0, top: 0 }]).jpeg({ quality: 86 }).toFile(join(PUB, 'og.jpg'));
   const mono = s => Buffer.from(`<svg width="${s}" height="${s}" xmlns="http://www.w3.org/2000/svg">
-    <rect width="${s}" height="${s}" rx="${Math.round(s * 0.18)}" fill="#F2F0EB"/>
-    <text x="50%" y="${Math.round(s * 0.69)}" text-anchor="middle" font-family="Instrument Serif, Georgia, 'Times New Roman', serif" font-style="italic" font-size="${Math.round(s * 0.62)}" fill="#141414">mh</text>
+    <rect width="${s}" height="${s}" rx="${Math.round(s * 0.18)}" fill="#FFFFFF"/>
+    <text x="50%" y="${Math.round(s * 0.69)}" text-anchor="middle" font-family="Instrument Serif, Georgia, 'Times New Roman', serif" font-style="italic" font-size="${Math.round(s * 0.62)}" fill="#000000">mh</text>
   </svg>`);
   await sharp(mono(64)).png().toFile(join(PUB, 'favicon.png'));
   await sharp(mono(180)).png().toFile(join(PUB, 'apple-touch-icon.png'));
@@ -277,11 +277,11 @@ async function buildBrandFromSeal(sealPath, site) {
   const outDir = join(ROOT, 'tilda', 'icons'); await mkdir(outDir, { recursive: true });
   await writeFile(join(outDir, 'favicon.ico'), Buffer.concat([head, ...pngs]));
   for (const n of [152, 180, 270, 512]) await writeFile(join(outDir, `icon-${n}.png`), await sq(n));
-  for (const n of [152, 180]) await sharp({ create: { width: n, height: n, channels: 3, background: '#F2F0EB' } }).composite([{ input: await sq(Math.round(n * 0.84)), gravity: 'centre' }]).png().toFile(join(outDir, `icon-${n}-paper.png`));
-  await sharp({ create: { width: 180, height: 180, channels: 3, background: '#F2F0EB' } })
+  for (const n of [152, 180]) await sharp({ create: { width: n, height: n, channels: 3, background: '#FFFFFF' } }).composite([{ input: await sq(Math.round(n * 0.84)), gravity: 'centre' }]).png().toFile(join(outDir, `icon-${n}-paper.png`));
+  await sharp({ create: { width: 180, height: 180, channels: 3, background: '#FFFFFF' } })
     .composite([{ input: await sharp(cut).resize(150, 150).png().toBuffer(), left: 15, top: 15 }]).png().toFile(join(PUB, 'apple-touch-icon.png'));
   const W = 1200, H = 630, S = 470;
-  await sharp({ create: { width: W, height: H, channels: 3, background: '#F2F0EB' } })
+  await sharp({ create: { width: W, height: H, channels: 3, background: '#FFFFFF' } })
     .composite([{ input: await sharp(cut).resize(S, S).png().toBuffer(), left: Math.round((W - S) / 2), top: Math.round((H - S) / 2) }])
     .jpeg({ quality: 88 }).toFile(join(PUB, 'og.jpg'));
 }
@@ -298,7 +298,7 @@ async function injectHtml(site, manifest, byId) {
   const og = base ? `${base}/og.jpg` : 'og.jpg';
   const meta = `<title>${escHtml(title)}</title>
 <meta name="description" content="${escHtml(desc)}">
-<meta name="theme-color" content="#F2F0EB">
+<meta name="theme-color" content="#FFFFFF">
 <meta property="og:type" content="website">
 <meta property="og:title" content="${escHtml(title)}">
 <meta property="og:description" content="${escHtml(desc)}">
@@ -355,9 +355,11 @@ function roleOf(site, cat, im) {
 // ---------- main ----------
 async function main() {
   const t0 = Date.now();
-  if (!existsSync(SRC)) {   // a machine without the sources (code-only edits): just stamp the version so caches turn over
+  if (!existsSync(SRC)) {   // a machine without the sources (code-only edits): icons from the seal, then the version so caches turn over
+    const seal = await findSeal();
+    if (seal) await buildBrandFromSeal(seal, await readJSON(join(CONTENT, 'site.json'), {}));
     const codeV = await stampVersion();
-    console.log(`no media-src here: media untouched, code version ${codeV}`);
+    console.log(`no media-src here: media untouched, icons ${seal ? 'rebuilt' : 'kept'}, code version ${codeV}`);
     return;
   }
   const site = await readJSON(join(CONTENT, 'site.json'), {});

@@ -5,9 +5,9 @@
   if (!document.getElementById('mh-loader')) {
     const l = document.createElement('div'); l.id = 'mh-loader';
     // the stylesheet is not here yet, so the motion tokens (360ms, the two curves, the glint band) are repeated inline
-    l.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:#F2F0EB;display:flex;align-items:center;justify-content:center;font:11px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.02em;color:#141414;text-transform:lowercase;transition:opacity 360ms cubic-bezier(.2,.7,.1,1)';
+    l.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:#FFFFFF;display:flex;align-items:center;justify-content:center;font:11px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.02em;color:#000000;text-transform:lowercase;transition:opacity 360ms cubic-bezier(.2,.7,.1,1)';
     const t = document.createElement('span'); t.textContent = window.MH_NAME || 'mila harys'; l.appendChild(t);
-    t.style.cssText = 'background:linear-gradient(100deg,#141414 0 44%,#8a867e 50%,#141414 56% 100%) 100% 0/300% 100% no-repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent';
+    t.style.cssText = 'background:linear-gradient(100deg,#000000 0 44%,#8C8C8C 50%,#000000 56% 100%) 100% 0/300% 100% no-repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent';
     (document.body || document.documentElement).appendChild(l);
     // one band of light through the name, then stillness
     try { if (!matchMedia('(prefers-reduced-motion: reduce)').matches) t.animate([{ backgroundPosition: '100% 0' }, { backgroundPosition: '0 0' }], { duration: 1200, delay: 350, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' }); } catch {}

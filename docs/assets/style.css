@@ -1,7 +1,7 @@
 /* ===== tokens ===== */
 :root{
-  --paper:#F2F0EB; --ink:#141414; --muted:#8A867E; --tag:#FBFAF7; --ghost:#E6E3DC;
-  --line:rgba(20,20,20,.15); --edge:rgba(20,20,20,.08);
+  --paper:#FFFFFF; --ink:#000000; --muted:#8C8C8C; --tag:#FFFFFF; --ghost:#EEEEEE;
+  --line:rgba(0,0,0,.15); --edge:rgba(0,0,0,.08);
   --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
   --sai-t:env(safe-area-inset-top,0px); --sai-r:env(safe-area-inset-right,0px);
   --sai-b:env(safe-area-inset-bottom,0px); --sai-l:env(safe-area-inset-left,0px);
@@ -82,7 +82,7 @@ body.project-open #stage,body.contact-open #stage{filter:blur(8px);opacity:.55}
    A closed layer is invisible, not display:none, so its layout is already done when it is asked for and the fade starts clean */
 .layer{position:fixed;inset:0;z-index:15;background:var(--paper);opacity:0;visibility:hidden;overflow:hidden;
   transition:opacity var(--t-3) var(--e-out),visibility 0s linear var(--t-3)}
-.project{background:rgba(242,240,235,.8)}
+.project{background:rgba(255,255,255,.8)}
 .layer.open{opacity:1;visibility:visible;transition:opacity var(--t-3) var(--e-out),visibility 0s}
 .layer .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
   padding:calc(28px + var(--sai-t)) calc(var(--gutter) + var(--sai-r)) calc(96px + var(--sai-b)) calc(var(--gutter) + var(--sai-l))}
@@ -98,7 +98,7 @@ body.project-open #stage,body.contact-open #stage{filter:blur(8px);opacity:.55}
 .tile img,.tile video{width:100%;height:100%;object-fit:cover}
 .empty{color:var(--muted);padding:20px 0}
 /* contact: translucent paper over the strip, centred text */
-.contact{position:fixed;inset:0;z-index:20;background:rgba(242,240,235,.72);display:flex;align-items:center;justify-content:center;text-align:center;opacity:0;visibility:hidden;cursor:default;
+.contact{position:fixed;inset:0;z-index:20;background:rgba(255,255,255,.72);display:flex;align-items:center;justify-content:center;text-align:center;opacity:0;visibility:hidden;cursor:default;
   transition:opacity var(--t-3) var(--e-out),visibility 0s linear var(--t-3)}
 .contact.open{opacity:1;visibility:visible;transition:opacity var(--t-3) var(--e-out),visibility 0s}
 .contact .info{filter:blur(6px);transition:filter var(--t-3) var(--e-out)}
@@ -131,7 +131,7 @@ body.project-open #stage,body.contact-open #stage{filter:blur(8px);opacity:.55}
   padding:12px calc(var(--gutter) + var(--sai-r)) calc(14px + var(--sai-b)) calc(var(--gutter) + var(--sai-l));font-size:14px;color:var(--muted)}
 .v-bottom .cr,.v-bottom > span:not(.proj){display:none}
 /* a shoot with a page: its name is the link, marked by a hairline only, in the same quiet grey */
-.v-bottom a{padding:10px 3px;margin:-10px -3px;color:inherit;text-decoration:underline;text-decoration-color:rgba(20,20,20,.25);text-underline-offset:4px;text-decoration-thickness:1px}
+.v-bottom a{padding:10px 3px;margin:-10px -3px;color:inherit;text-decoration:underline;text-decoration-color:rgba(0,0,0,.25);text-underline-offset:4px;text-decoration-thickness:1px}
 .v-bottom a:hover{text-decoration-color:currentColor}
 .v-ctl{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;align-items:center;gap:14px;padding:22px 12px 10px;font-size:12px;color:#fff;cursor:default;background:linear-gradient(to top,rgba(0,0,0,.45),rgba(0,0,0,0))}
 .v-ctl .bar{flex:1;height:14px;position:relative;cursor:pointer}
